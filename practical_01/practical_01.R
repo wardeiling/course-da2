@@ -5,6 +5,7 @@
 # load libraries
 library(tidyverse)
 library(glmnet)
+library(caret)
 
 ##### Take Home Exercises #####
 
@@ -26,6 +27,7 @@ length(unique(gene_exp$sample))
 
 # create histograms of the first six variables
 firstsix <- gene_exp[,2:7]
+coln <- colnames(firstsix)
 
 par(mfrow = c(2,3))
 for (i in 1:6) {
@@ -61,16 +63,17 @@ table(gene_exp_dis$disease)
 
 # recode disease into dummy variable where normal = 0 and tumor = 1
 gene_exp_dis$disease_dum <- NA
-gene_exp_dis$disease_dum[train$disease == "normal"] <- 1
-gene_exp_dis$disease_dum[train$disease == "tumor"] <- 2
+gene_exp_dis$disease_dum[gene_exp_dis$disease == "normal"] <- 1
+gene_exp_dis$disease_dum[gene_exp_dis$disease == "tumor"] <- 2
 gene_exp_dis$disease_dum <- as.numeric(gene_exp_dis$disease_dum)
-  
+
 # split data
 set.seed(123)
 train_index <- sample(1:nrow(gene_exp_dis), 0.8*nrow(gene_exp_dis))
 train <- gene_exp_dis[train_index,]
 test <- gene_exp_dis[-train_index,]
 
+test$disease
 ##### Lab Exercises #####
 
 ### 6. ------------------------------
@@ -87,4 +90,55 @@ cor_abs <- abs(cor_fil)
 cor_greatest <- cor_abs %>% as.data.frame() %>% arrange(desc(cor_abs)) %>% head(10)
 sel_genes <- rownames(cor_greatest)
 
+### 7. ------------------------------
 
+# perform logistic regression using the selected gens
+train_sel_gens <- train %>% select(sel_genes, disease, disease)
+train_sel_gens$disease <- as.factor(train_sel_gens$disease) # tumor becomes 2, normal 1
+fit_lr <- glm(disease ~ ., data = train_sel_gens, family = "binomial")
+summary(fit_lr)
+
+# str(train_sel_gens)
+
+### 8. ------------------------------
+
+# create confusion matrix for predictions of the model
+test_sel_gens <- test %>% select(sel_genes, disease, sample)
+predictions_prob_test <- predict(fit_lr, newdata = test_sel_gens, type = "response")
+predictions_df <- data.frame(sample = test_sel_gens$sample, observed = test_sel_gens$disease, test_pred_prob = predictions_prob_test)
+predictions_df$test_pred <- NA
+predictions_df$test_pred[predictions_df$test_pred_prob > 0.5] <- "tumor"
+predictions_df$test_pred[predictions_df$test_pred_prob < 0.5] <- "normal"
+predictions_df$test_pred <- as.factor(predictions_df$test_pred)
+predictions_df$observed <- as.factor(predictions_df$observed)
+
+# create confusion matrix
+confusionMatrix(predictions_df$test_pred, predictions_df$observed)
+
+### 9. ------------------------------
+
+x_train <- as.matrix(train %>%
+                      select(-sample, -disease_dum, -disease))
+y_train <- as.matrix(train %>%
+                       select(disease) %>%
+                       mutate(disease = as.factor(disease)))
+x_test <- as.matrix(test %>%
+                      select(-sample, -disease_dum, -disease))
+y_test <- as.matrix(test %>%
+                      select(disease) %>%
+                      mutate(disease = as.factor(disease)))
+
+### 10. ------------------------------
+
+lasso <- glmnet(x_train, y_train, family = "binomial")
+par(mfrow = c(1,1))
+plot(lasso)
+
+### 11. ------------------------------
+
+cv_lasso <- cv.glmnet(x_train, y_train, family = "binomial")
+
+### 12. ------------------------------
+
+
+### 13. ------------------------------
