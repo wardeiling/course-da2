@@ -73,7 +73,6 @@ train_index <- sample(1:nrow(gene_exp_dis), 0.8*nrow(gene_exp_dis))
 train <- gene_exp_dis[train_index,]
 test <- gene_exp_dis[-train_index,]
 
-test$disease
 ##### Lab Exercises #####
 
 ### 6. ------------------------------
@@ -113,7 +112,7 @@ predictions_df$test_pred <- as.factor(predictions_df$test_pred)
 predictions_df$observed <- as.factor(predictions_df$observed)
 
 # create confusion matrix
-confusionMatrix(predictions_df$test_pred, predictions_df$observed)
+cor_log_reg_confusion <- confusionMatrix(predictions_df$test_pred, predictions_df$observed)
 
 ### 9. ------------------------------
 
@@ -133,12 +132,46 @@ y_test <- as.matrix(test %>%
 lasso <- glmnet(x_train, y_train, family = "binomial")
 par(mfrow = c(1,1))
 plot(lasso)
+savePlot("p_lasso")
+
+# We see the parameters associated with the different genes
 
 ### 11. ------------------------------
 
 cv_lasso <- cv.glmnet(x_train, y_train, family = "binomial")
+plot(cv_lasso)
+
+# the plot shows the binomial deviance, which is a predictive accuracy measure
+# relative to the log of the hyperparameter lambda.
+# we can see that the lowest deviance (so best predictive accuracy) 
+# is found near a log(lambda) of about -4.9
 
 ### 12. ------------------------------
 
+# inspect the non-zero coefficients of the model with lowest OOS deviance
+cv_coef_SE <- as.data.frame(as.matrix(coef(cv_lasso, s = "lambda.1se"))) %>%
+  filter(s1 != 0)
+cv_coef_min <- as.data.frame(as.matrix(coef(cv_lasso, s = "lambda.min"))) %>%
+  filter(s1 != 0)
 
 ### 13. ------------------------------
+
+predicted_cv_lasso <- predict(
+  object = cv_lasso,
+  newx = x_test,
+  s = "lambda.min",
+  type = "response"
+)
+
+predicted <- ifelse(predicted_cv_lasso[,"lambda.min"] > 0.5, "tumor", "normal")
+lasso_cv_confusion <- confusionMatrix(as.factor(predicted), reference = as.factor(y_test))
+
+cor_log_reg_confusion # for the simple procedure, the accuracy was 91.67%
+lasso_cv_confusion # for the LASSO with CV, the accuracy was higher at 95.83%
+
+# I would say that in this instance, both methods yields reasonable results. 
+# However, when relationships not (log) linear, the former method may miss
+# important predictors, due to the use of correlations for variable selection.
+# On the other hand, the lasso procedure is more robust against such things 
+# as instead of performing feature/variable selection, we simply change the 
+# parameter weights of the worst predictors towards zero.
