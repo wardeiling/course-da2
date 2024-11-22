@@ -1,0 +1,283 @@
+---
+title: "practical_02"
+author: "Ward B. Eiling"
+format: html
+---
+
+## Take home exercises
+
+In this exercise, the data of Example 1 from the lecture slides are used. These data have been stored in the file `Example1.dat`.
+
+**1. Use the function `read.table()` to import the data into R. Use the function `as.matrix()` to convert the data frame to a matrix. The two features are not centered. To center the two features the function `scale()` with the argument `scale = FALSE` can be used. Give the centered data matrix a name, for instance, `C`.**
+
+```{r}
+Dat <- read.table("practical_02/data/Example1.dat")
+Mat <- as.matrix(Dat)
+C <- scale(Mat, center = TRUE, scale = FALSE)
+```
+
+**2. Calculate the sample size `N` and the covariance matrix `S` by executing the following R code, where the function `t()` is used to calculate the transpose of `C` and `%*%` is used for matrix multiplication.**
+
+```{r}
+(N <- dim(C)[1])
+(S <- t(C) %*% C/N )
+```
+
+**3. Use the function `svd()` to apply a singular value decomposition to the centered data matrix.**
+
+```{r}
+svd_output <- svd(C)
+```
+
+**4. Inspect the three pieces of output, that is, `U`, `D`, and `V`. Are the three matrices the same as on the slides?**
+
+```{r}
+(U <- svd_output$u)
+(D <- svd_output$d)
+(V <- svd_output$v)
+```
+
+*Note:* A singular value decomposition is not unique. The singular values are unique, but the left and right singular vectors are only unique up to sign. This means that the singular vectors can be multiplied by -1 without changing the singular value decomposition.
+
+**5. Use a single matrix product to calculate the principal component scores.**
+
+```{r}
+# two methods to compute the PC scores
+(lambda_hat <- U %*% diag(D))
+(lamdba_hat <- C %*% V)
+```
+
+**6. Plot the scores on the second principal component (y-axis) against the scores on the first principal component (x-axis) and let the range of the x-axis run from -18 to 18 and the range of the y-axis from -16 to 16.**
+
+```{r}
+pc1 <- lambda_hat[,1]
+pc2 <- lambda_hat[,2]
+plot(pc1,pc2 , xlim = c(-18, 18), ylim = c(-16, 16))
+```
+
+**7. Use the function `eigen()` to apply an eigendecomposition to the sample covariance matrix.**
+
+```{r}
+(delta <- eigen(S))
+(eigen_val <- delta$values)
+```
+
+Note that an alternative form of the eigendecomposition of the covariance matrix ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"} is given by
+
+where ![\\mathbf{v}\_{j}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7Bv%7D_%7Bj%7D "\mathbf{v}_{j}"){alt="\\mathbf{v}_{j}"} is the ![j](https://latex.codecogs.com/svg.latex?j "j"){alt="j"}th eigenvector of ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"}. From this alternative form it is clear that the (ortho-normal) eigenvectors are only defined up to sign because ![\\mathbf{v}\_{j}\\mathbf{v}\_{j}\^{T}=-\\mathbf{v}\_{j}(-\\mathbf{v}\_{j}\^{T})](https://latex.codecogs.com/svg.latex?%5Cmathbf%7Bv%7D_%7Bj%7D%5Cmathbf%7Bv%7D_%7Bj%7D%5E%7BT%7D%3D-%5Cmathbf%7Bv%7D_%7Bj%7D%28-%5Cmathbf%7Bv%7D_%7Bj%7D%5E%7BT%7D%29 "\mathbf{v}_{j}\mathbf{v}_{j}^{T}=-\mathbf{v}_{j}(-\mathbf{v}_{j}^{T})"){alt="\\mathbf{v}_{j}\\mathbf{v}_{j}^{T}=-\\mathbf{v}_{j}(-\\mathbf{v}_{j}^{T})"}. This may lead to differences in sign in the output.
+
+**8. Check whether the eigenvalues are equal to the variances of the two principal components. Be aware that the R-base function `var()` takes ![N-1](https://latex.codecogs.com/svg.latex?N-1 "N-1"){alt="N-1"} in the denominator, to get an unbiased estimate of the variance.**
+
+```{r}
+pc1_m <- mean(pc1)
+pc2_m <- mean(pc2)
+
+pc1_dif <- numeric(N)
+pc2_dif <- numeric(N)
+
+for(i in 1:N) {
+  pc1_dif[i] <- (pc1[i]-pc1_m)^2
+  pc2_dif[i] <- (pc2[i]-pc2_m)^2
+}
+
+(pc1_var <- sum(pc1_dif)/N)
+(pc2_var <- sum(pc2_dif)/N)
+```
+
+**9. Finally, calculate the percentage of total variance explained by each principal component.**
+
+```{r}
+(total_var_pc1 <- eigen_val[1]/(eigen_val[1]+eigen_val[2])*100)
+(total_var_pc1 <- eigen_val[2]/(eigen_val[1]+eigen_val[2])*100)
+```
+
+alternatively, we could standardize the scores first.
+
+## Principal component analysis
+
+In this exercise, a PCA is used to determine the financial strength of insurance companies. Eight relevant features have been selected: (1) gross written premium, (2) net mathematical reserves, (3) gross claims paid, (4) net premium reserves, (5) net claim reserves, (6) net income, (7) share capital, and (8) gross written premium ceded in reinsurance.
+
+To perform a principal component analysis, an eigendecomposition can be applied to the sample correlation matrix ![\\mathbf{R}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BR%7D "\mathbf{R}"){alt="\\mathbf{R}"} instead of the sample covariance matrix ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"}. Note that the sample correlation matrix is the sample covariance matrix of the standardized features. These two ways of doing a PCA will yield different results. If the features have the same scales (the same units), then the covariance matrix should be used. If the features have different scales, then it’s better in general to use the correlation matrix because otherwise the features with high absolute variances will dominate the results.
+
+The means and standard deviations of the features can be found in the following table.
+
+| feature            |        mean |    std.dev. |
+|:-------------------|------------:|------------:|
+| \(1\) GR_WRI_PRE   | 143,232,114 | 228,320,220 |
+| \(2\) NET_M_RES    |  43,188,939 | 151,739,600 |
+| \(3\) GR_CL_PAID   |  65,569,646 | 125,986,400 |
+| \(4\) ET_PRE_RES   |  41,186,950 |  65,331,440 |
+| \(5\) NET_CL_RES   |  14,726,188 |  24,805,660 |
+| \(6\) NET_INCOME   |  -1,711,048 |  22,982,140 |
+| \(7\) SHARE_CAP    |  33,006,176 |  38,670,760 |
+| \(8\) R_WRI_PR_CED |  37,477,746 |  93,629,540 |
+
+The sample correlation matrix is given below.
+
+|       | \(1\) | \(2\) | \(3\) | \(4\) | \(5\) | \(6\) | \(7\) | \(8\) |
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| \(1\) | 1.00  | 0.32  | 0.95  | 0.94  | 0.84  | 0.22  | 0.47  | 0.82  |
+| \(2\) | 0.32  | 1.00  | 0.06  | 0.21  | 0.01  | 0.30  | 0.10  | 0.01  |
+| \(3\) | 0.95  | 0.06  | 1.00  | 0.94  | 0.89  | 0.14  | 0.44  | 0.81  |
+| \(4\) | 0.94  | 0.21  | 0.94  | 1.00  | 0.88  | 0.19  | 0.50  | 0.68  |
+| \(5\) | 0.84  | 0.01  | 0.89  | 0.88  | 1.00  | -0.23 | 0.55  | 0.63  |
+| \(6\) | 0.22  | 0.30  | 0.14  | 0.19  | -0.23 | 1.00  | -0.15 | 0.21  |
+| \(7\) | 0.47  | 0.10  | 0.44  | 0.50  | 0.55  | -0.15 | 1.00  | 0.14  |
+| \(8\) | 0.82  | 0.01  | 0.81  | 0.68  | 0.63  | 0.21  | 0.14  | 1.00  |
+
+```{r}
+R <- matrix(c(1.00,0.32,0.95,0.94,0.84,0.22,0.47,0.82,
+              0.32,1.00,0.06,0.21,0.01,0.30,0.10,0.01,
+              0.95,0.06,1.00,0.94,0.89,0.14,0.44,0.81,
+              0.94,0.21,0.94,1.00,0.88,0.19,0.50,0.68,
+              0.84,0.01,0.89,0.88,1.00,-0.23,0.55,0.63,
+              0.22,0.30,0.14,0.19,-0.23,1.00,-0.15,0.21,
+              0.47,0.10,0.44,0.50,0.55,-0.15,1.00,0.14,
+              0.82,0.01,0.81,0.68,0.63,0.21,0.14,1.00),
+            nrow = 8)
+```
+
+**9. Use `R` to apply a PCA to the sample correlation matrix.**
+
+```{r}
+(delta <- eigen(R))
+```
+
+An alternative criterion for extracting a smaller number of principal components ![m](https://latex.codecogs.com/svg.latex?m "m"){alt="m"} than the number of original variables ![p](https://latex.codecogs.com/svg.latex?p "p"){alt="p"} in applying a PCA to the sample correlation matrix, is the eigenvalue-greater-than-one rule. This rule says that ![m](https://latex.codecogs.com/svg.latex?m "m"){alt="m"} (the number of extracted principal components) should be equal to the number of eigenvalues greater than one. Since each of the standardized variables has a variance of one, the total variance is ![p](https://latex.codecogs.com/svg.latex?p "p"){alt="p"}. If a principal component has an eigenvalue greater than one, than its variance is greater than the variance of each of the original standardized variables. Then, this principal component explains more of the total variance than each of the original standardized variables.
+
+**10. How many principal components should be extracted according to the eigenvalue-greater-than-one rule?**
+
+```{r}
+(eigen_val <- delta$values)
+sum(eigen_val > 1)
+```
+
+3 PCs should be extracted.
+
+**11. How much of the total variance does this number of extracted principal components explain?**
+
+```{r}
+(eigen_val[1]+eigen_val[2]+eigen_val[3])/sum(eigen_val)*100
+```
+
+So 88.9% of the total variance in the features.
+
+**12. Make a scree-plot. How many principal components should be extracted according to the scree-plot?**
+
+```{r}
+plot(eigen_val)
+```
+
+according to the scree plot, I would extract 1 principal component as when we draw a line and look at which values remain before the elbow, only the first one remains.
+
+**13. How much of the total variance does this number of extracted principal components explain?**
+
+```{r}
+(eigen_val[1])/sum(eigen_val)*100
+```
+
+The first PC explains 58% of the total variance.
+
+**14. Install the `R`-package `keras`, following the steps outlined [here](https://tensorflow.rstudio.com/install/).**
+
+*Note that the latest `python` version you can use is `3.11`. It can be that you have to set the `python` interpreter in `R Studio`. This can be done at `Tools > Global Options > Python`.*
+
+# Lab exercise
+
+In this assignment, you will perform a PCA to a simple and easy to understand dataset. You will use the `mtcars` dataset, which is built into R. This dataset consists of data on 32 models of car, taken from an American motoring magazine (1974 Motor Trend magazine). For each car, you have 11 features, expressed in varying units (US units). They are as follows:
+
+-   `mpg`: fuel consumption (miles per (US) gallon); more powerful and heavier cars tend to consume more fuel.
+
+-   `cyl`: number of cylinders; more powerful cars often have more cylinders.
+
+-   `disp`: displacement (cu.in.); the combined volume of the engine’s cylinders.
+
+-   `hp`: gross horsepower; this is a measure of the power generated by the car.
+
+-   `drat`: rear axle ratio; this describes how a turn of the drive shaft corresponds to a turn of the wheels. Higher values will decrease fuel efficiency.
+
+-   `wt`: weight (1000 lbs).
+
+-   `qsec`: 1/4 mile time, the cars speed and acceleration.
+
+-   `vs`: engine block; this denotes whether the vehicle’s engine is shaped like a ‘V’, or is a more common straight shape.
+
+-   `am`: transmission; this denotes whether the car’s transmission is automatic (0) or manual (1).
+
+-   `gear`: number of forward gears; sports cars tend to have more gears.
+
+-   `carb`: number of carburetors; associated with more powerful engines.
+
+Note that the units used vary and occupy different scales.
+
+First, the principal components will be computed. Because PCA works best with numerical data, you’ll exclude the two categorical variables (vs and am; columns 8 and 9). You are left with a matrix of 9 columns and 32 rows, which you pass to the `prcomp()` function, assigning your output to `mtcars.pca`. You will also set two arguments, `center` and `scale`, to be `TRUE`. This is done to apply a principal component analysis to the standardized features. So, execute
+
+```{r}
+mtcars.pca <- prcomp(mtcars[, c(1:7, 10, 11)],                      center = TRUE, scale = TRUE)
+```
+
+**15. Have a peek at the PCA object with `summary()`.**
+
+```{r}
+summary(mtcars.pca)
+```
+
+You obtain 9 principal components, which you call PC1-9. Each of these explains a percentage of the total variance in the dataset.
+
+**16. What is the percentage of total variance explained by PC1?**
+
+62.84%
+
+**17. What is the percentage of total variance explained by PC1, PC2, and PC3 together?**
+
+91.58%
+
+The PCA object `mtcars.pca` contains the following information:
+
+-   the center point or the vector of feature means (`$center`)
+
+-   the vector of feature standard deviations (`$scale`)
+
+-   the vector of standard deviations of the principal components (`$sdev`)
+
+-   the eigenvectors (`$rotation`)
+
+-   the principal component scores (`$x`)
+
+**18. Determine the eigenvalues. How many principal components should be extracted according to the eigenvalue-greater-than-one rule?**
+
+2 principal components.
+
+**19. What is the value of the total variance? Why?**
+
+for 2 PCs, the total variance is 85.98%
+
+**20. How much of the total variance is explained by the number of extracted principal components according to the eigenvalue-greater-than-one rule?**
+
+for 2 PCs, the total variance is 85.98%
+
+Next, a couple of plots will be produced to visualize the PCA solution. You will make a biplot, which includes both the position of each observation (car model) in terms of PC1 and PC2 and also will show you how the initial features map onto this. A biplot is a type of plot that will allow you to visualize how the observations relate to one another in the PCA (which observations are similar and which are different) and will simultaneously reveal how each feature contributes to each principal component.
+
+**21. Use the function `biplot()` with the argument `choices = c(1, 2)` to ask for a biplot for the first two principal components.**
+
+```{r}
+biplot(mtcars.pca, choices = c(1,2), cex = 0.5)
+```
+
+The axes of the biplot are seen as arrows originating from the center point. Here, you see that the variables hp, cyl, and disp all contribute to PC1, with higher values in those variables moving the observations to the right on this plot. This lets you see how the car models relate to the axes. You can also see which cars are similar to one another. For example, the Maserati Bora, Ferrari Dino and Ford Pantera L all cluster together at the top. This makes sense, as all of these are sports cars.
+
+**22. Make a biplot for the first and third principal components. Especially which brand of car has negative values on the first principal component and positive values on the third principal component?**
+
+```{r}
+biplot(mtcars.pca, choices = c(1,3), cex = 0.5)
+```
+
+Especially the brand "Merc" tends to have a high positive score on PC3 and a high negative score on PC1
+
+**23. Use the function `screeplot()` with the argument `type = 'lines'` to produce a scree-plot. How many principal components should be extracted according to this plot? Why? Is this number in agreement with the number of principal components extracted according to the eigenvalue-greater-than-one rule?**
+
+```{r}
+screeplot(mtcars.pca, type = 'lines')
+```
+
+According to the screeplot, we should extract 2 principal components, as if we draw a straight line it passes through PC 3 to 9, and if we then take the elements before the elbow, only PC 1 and PC2 remain.
