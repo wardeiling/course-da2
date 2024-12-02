@@ -1,0 +1,401 @@
+---
+title: "Practical 03"
+author: "Ward B. Eiling"
+format: pdf
+editor: visual
+---
+
+# Take home exercises
+
+**Load required packages.**
+
+```{r}
+# install.packages("fastICA") 
+# install.packages("BiocManager") 
+# BiocManager::install("Biobase") 
+# install.packages("NMF") 
+# install.packages("svs") 
+```
+
+```{r}
+library(fastICA) 
+library(NMF) 
+library(svs) 
+```
+
+## Factor analysis
+
+In this exercise, you will factor analyze the data of the places rated example given in the lecture slides. The data file is `places.txt`.
+
+-   [`places.txt`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/places.txt)
+
+**1. Import the data into R.**
+
+*Note. Since the variable names are not in the first line, use the argument `header=FALSE` in the function `read.table()`.*
+
+```{r}
+places <- read.table("practical_03/places.txt", header = FALSE)
+```
+
+**2. Factor analyze the data using the `R`-function `factanal()` with five factors, and include the argument `scores='regression'`.**
+
+```{r}
+fa_result <- factanal(places, factors = 5, scores = "regression")
+fa_result
+```
+
+**3. Calculate the correlations between the factor scores. Are the correlations as expected? Why or why not?**
+
+```{r}
+cor(fa_result$scores)
+```
+
+The correlations should be near zero if the factors are orthogonal. Otherwise, they indicate interdependence among factors, potentially conflicting with the assumption of independence.
+
+## Independent component analysis
+
+The R package `fastICA` can be used for independent component analysis (ICA).
+
+**4. Fit an ICA model with three components on the places data using the `R`-function `fastICA()`.**
+
+*Note. The centered data can be obtained using `$X`, the matrix of weights (loadings) can be obtained using `$A`, and the independent component scores can be obtained using `$S`.*
+
+```{r}
+library(fastICA)
+ica <- fastICA(places, n.comp = 3)
+# ica
+```
+
+**5. Obtain the proportion of variance explained by the solution with three components.**
+
+*Hint:* The proportion of variance explained can be obtained by dividing the total variance of ![SA](https://latex.codecogs.com/svg.latex?SA "SA"){alt="SA"} by the total variance of ![X](https://latex.codecogs.com/svg.latex?X "X"){alt="X"}, where total variance is simply the sum of the diagonal elements of the variance-covariance matrix.
+
+```{r}
+x <- c(ica$X) 
+e <- c(ica$S %*% ica$A)  
+(2*crossprod(x, e) - crossprod(e))/crossprod(x)
+```
+
+**6. Calculate the correlations between the original features and the components. Are they as you expect?**
+
+*Hint:* Recall that the independent component scores are stored under `$S`.
+
+```{r}
+cor(places, ica$S)
+```
+
+High correlations for some components suggest strong relationships between original variables and these components.
+
+**7. Now calculate the correlations among the components. Are they as you expect?**
+
+```{r}
+cor(ica$S)
+```
+
+Ideally, these should be close to zero, reflecting the independence assumption in ICA.
+
+## Non-negative matrix factorization
+
+One arena in which an understanding of the hidden components which drive the system is crucial (and potentially lucrative), is financial markets. It is widely believed that the stock market and indeed individual stock prices are determined by fluctuations in underlying but unknown factors (signals). If one could determine and predict these components, one would have the opportunity to leverage this knowledge for financial gain. In this exercise, non-negative matrix factorization (NMF) is used to learn the components which drive the stock market; specifically, the closing prices for 5 recent years for 505 companies currently found on the S&P 500 index, are used.
+
+-   [`close_stocks.dat`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/close_stocks.dat)
+
+**8. Load the stocks data into `R` with the function `read.table()`.**
+
+*Hint:* Make sure to set `header=TRUE` and `sep = "\t"`.
+
+```{r}
+stocks <- read.table("practical_03/close_stocks.dat", header = TRUE, sep = "\t")
+```
+
+**9. Remove the first column with the company names. Also remove the observations with missing values, and store the data in a matrix.**
+
+```{r}
+stocks <- na.omit(stocks[, -1])
+stocks_matrix <- as.matrix(stocks)
+```
+
+**10. Run the function `nmf()` with 1, 2 and 3 components.**
+
+```{r}
+library(NMF)
+nmf_1 <- nmf(stocks_matrix, rank = 1)
+nmf_2 <- nmf(stocks_matrix, rank = 2)
+nmf_3 <- nmf(stocks_matrix, rank = 3)
+```
+
+**11. Calculate the proportion of variance explained by each solution using the function `evar()`.**
+
+```{r}
+evar(nmf_1, stocks_matrix)
+evar(nmf_2, stocks_matrix)
+evar(nmf_3, stocks_matrix)
+```
+
+**12. Calculate the correlations between the features according to the model of your choice. Are they highly correlated?**
+
+```{r}
+chosen_model <- nmf_3  # Assuming we choose 3 components
+H <- basis(chosen_model)
+cor(stocks_matrix, H)
+```
+
+## Probabilistic latent semantic analysis
+
+In this exercise, probabilistic latent semantic analysis is applied to the data file . The data set consists of letter counts in 12 samples of texts from books by six different authors. The author of the first two documents (books) is Pearl S. Buck, the author of the second two documents is James Michener, the author of the third two documents is Arthur C. Clarke, the author of the fourth two documents is Ernest Hemingway, the author of the fifth two documents is William Faulkner, and the author of the last two documents is Victoria Holt.
+
+-   [`author.txt`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/author.txt)
+
+**13. Read the `author.txt` data into `R` using the function `read.table()`, remove the first column with document indices, and store the data as a matrix.**
+
+```{r}
+author <- read.table("practical_03/author.txt", header = TRUE)
+author_matrix <- as.matrix(author[, -1])
+```
+
+**14. Run the function `fast_plsa()` with 4, 5 and 6 components. Set the argument `symmetric=TRUE`.**
+
+*Note. Convergence may take a while for 5 and 6 latent classes, so to speed up the process you can set `tol = 1e-6`.*
+
+```{r}
+plsa_4 <- fast_plsa(author_matrix, k = 4, symmetric = TRUE, tol = 1e-6)
+plsa_5 <- fast_plsa(author_matrix, k = 5, symmetric = TRUE, tol = 1e-6)
+plsa_6 <- fast_plsa(author_matrix, k = 6, symmetric = TRUE, tol = 1e-6)
+```
+
+The output of the function `fast_plsa()` outputs a list with three elements, `prob0` ![= \\boldsymbol{\\Sigma}](https://latex.codecogs.com/svg.latex?%3D%20%5Cboldsymbol%7B%5CSigma%7D "= \boldsymbol{\Sigma}"){alt="= \\boldsymbol{\\Sigma}"}, `prob1` ![= \\boldsymbol{U}](https://latex.codecogs.com/svg.latex?%3D%20%5Cboldsymbol%7BU%7D "= \boldsymbol{U}"){alt="= \\boldsymbol{U}"} and `prob2` ![= \\boldsymbol{V}'](https://latex.codecogs.com/svg.latex?%3D%20%5Cboldsymbol%7BV%7D%27 "= \boldsymbol{V}'"){alt="= \\boldsymbol{V}'"}.
+
+**15. Test how many classes are needed by calculating Pearson’s ![\\chi\^2](https://latex.codecogs.com/svg.latex?%5Cchi%5E2 "\chi^2"){alt="\\chi^2"}-statistic for each solution. Which solution is the best?**
+
+The Pearson’s ![\\chi\^2](https://latex.codecogs.com/svg.latex?%5Cchi%5E2 "\chi^2"){alt="\\chi^2"}-statistic requires the estimated multinomial probabilities ![\\hat{\\boldsymbol{P}}=\\boldsymbol{U\\Sigma V\^\\top}](https://latex.codecogs.com/svg.latex?%5Chat%7B%5Cboldsymbol%7BP%7D%7D%3D%5Cboldsymbol%7BU%5CSigma%20V%5E%5Ctop%7D "\hat{\boldsymbol{P}}=\boldsymbol{U\Sigma V^\top}"){alt="\\hat{\\boldsymbol{P}}=\\boldsymbol{U\\Sigma V^\\top}"}, which can be obtained as follows.
+
+```{r}
+#| eval: false
+# put the output of fast_plsa() in a list
+plsa <- list(plsa_4, plsa_5, plsa_6)
+P <- lapply(plsa, function(x) x$prob1 %*% diag(x$prob0) %*% t(x$prob2)) 
+```
+
+*Note. `plsa` is a list with three elements: the output of `fast_plsa()` for 4, 5, and 6 components.*
+
+From these probabilities, we can compute the Pearson’s ![\\chi\^2](https://latex.codecogs.com/svg.latex?%5Cchi%5E2 "\chi^2"){alt="\\chi^2"}-statistic or the Likelihood-ratio statistic.
+
+```{r}
+#| eval: false
+Xsq <- sapply(P, function(x) sum((author - sum(author)*x)^2 / (sum(author)*x))) 
+Gsq <- sapply(P, function(x) 2*sum(log((author/(sum(author)*x))^author)))
+```
+
+Lastly, we need the degrees of freedom, which is the number of cells minus the number of parameters estimated. The number of cells is the number of rows times the number of columns, and the number of parameters is equal to the number of components, times the sum of the number of rows and the number of columns minus one.
+
+```{r}
+#| eval: false
+N <- nrow(author) 
+p <- ncol(author) 
+df <- N*p - r*(N+p-1) 
+```
+
+Accordingly, we can calculate the ![p](https://latex.codecogs.com/svg.latex?p "p"){alt="p"}-value as follows.
+
+```{r}
+#| eval: false
+1-pchisq(Xsq, df) 
+# [1] 0.000000e+00 2.220446e-16 1.410538e-12 
+```
+
+We can turn this into a function
+
+```{r}
+P <- lapply(list(plsa_4, plsa_5, plsa_6), function(x) {
+  x$prob1 %*% diag(x$prob0) %*% t(x$prob2)
+})
+Xsq <- sapply(P, function(p) sum((author_matrix - sum(author_matrix) * p)^2 / (sum(author_matrix) * p)))
+df <- nrow(author_matrix) * ncol(author_matrix) - c(4, 5, 6) * (nrow(author_matrix) + ncol(author_matrix) - 1)
+p_vals <- 1 - pchisq(Xsq, df)
+p_vals
+```
+
+The model with the smallest χ² value and a significant p-value fits best. The model with 6 components has the smallest χ² value and a significant p-value. Consequently, this model fits best.
+
+**16. How many classes do you select, based on these results?**
+
+6.
+
+**17. Given this number of latent classes, for which latent class has document 2 the highest probability?**
+
+```{r}
+plsa_6$prob1[2, ]
+```
+
+On the basis of the probabilities, document 2 is most likely to belong to class 6.
+
+**18. Which letter occurs the most for almost all classes?**
+
+```{r}
+rownames(plsa_6$prob2)[apply(plsa_6$prob2, 2, which.max)]
+```
+
+the letter "e".
+
+**19. Determine for the finally selected number of classes the proportion of explained variance by executing the following lines.**
+
+```{r}
+evar(plsa_6$prob1, author_matrix)
+
+# prepare variables
+P <- lapply(plsa, function(x) x$prob1 %*% diag(x$prob0) %*% t(x$prob2)) 
+
+# x <- c(author)
+# e <- c(sum(author) * P[[3]])
+# (2 * crossprod(x, e) - crossprod(e))/crossprod(x)
+
+# code didn't work, so I used evar
+```
+
+# Lab exercises
+
+## Factor analysis and independent component analysis
+
+The Macroeconomic variables, both real and financial, do have considerable influence, positive as well as negative, on the performance of the corporate sector of the economy. Consequently, the stock markets of the economy got affected by such performance. The movement of stock prices, apart from the firms’ fundamentals, also depends upon the level of development achieved in the economy and its integration towards the world economy.
+
+Since macroeconomic variables are highly interdependent, using all of them as explanatory variables in affecting the stock market may pose a severe multicolinearity problem and it becomes difficult to delineate the separate affects of different variables on the stock market movement. Deriving basic factors from such macroeconomic variables and employing these factors in pricing models can provide valuable information about the contents of priced factors in different stock markets. Generating orthogonal factor realizations eliminates the multicolinearity problem in estimating factor regression coefficients and serves to find the factors that are rewarded by the market. In this assignment, such factors will be extracted from twelve macroeconomic variables in India. The variables are:
+
+1.  Money Supply (MS),
+
+2.  Consumer Price Index (CPI),
+
+3.  Gold Prices (GP),
+
+4.  Crude Oil Prices (COP),
+
+5.  Foreign Exchange Reserves (FER),
+
+6.  Foreign Direct Investment (FDI),
+
+7.  Foreign Institutional Investment (FII),
+
+8.  Call Money Rate (CMR),
+
+9.  Balance of Trade (BOT),
+
+10. Foreign Exchange Rate (ER),
+
+11. Repo Rate (Repo),
+
+12. Industrial Growth Rate (IGR).
+
+The standardized observations in the data file `IndianSM.txt` are based on monthly averages, for 149 months.
+
+-   [`IndianSM.txt`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/IndianSM.txt)
+
+**20. Read the data into `R`, apply factor analysis and determine how many common factors are required to explain at least ![80\\](https://latex.codecogs.com/svg.latex?80%5C%25 "80\%"){alt="80\\"} of the total variance.**
+
+*Note. Set the number of starting values to `200`.*
+
+```{r}
+indian_sm <- read.table("practical_03/IndianSM.txt", header = TRUE)
+fa <- factanal(indian_sm, factors = 3, scores = "regression", nstart = 200)
+fa
+```
+
+**21. Does the factor model with the number of factors chosen in (20.) fit the data? Why**
+
+```{r}
+# Check the goodness-of-fit test
+fa$PVAL
+```
+
+The chi square statistic is 159.32 on 33 degrees of freedom. The p-value is 1.78e-18. 
+
+**22. Give the correlations between the ‘regression’ factor scores, given the in (20.) selected number of common factors?**
+
+```{r}
+# Compute correlations between factor scores
+cor(fa$scores)
+```
+
+**23. Carry out an independent component analysis and determine the number of independent components. How many independent components do you select? Why?**
+
+```{r}
+# Perform ICA with 3 components
+ica_india <- fastICA(indian_sm, n.comp = 3)
+
+# Evaluate number of components based on kurtosis or explained variance
+summary(ica_india)
+```
+
+**24. Give the correlations between the features (macro-economic variables) and the independent components. Use these correlations to interpret the independent components.**
+
+```{r}
+# Compute correlations between macroeconomic variables and ICA components
+cor(indian_sm, ica_india$S)
+```
+
+## Non-negative matrix factorization
+
+In this part of the assignment, non-negative matrix factorization (NMF) is used to once again learn the components which drive the stock market. Now, instead of the closing prices, the numbers of shares traded for 5 recent years for 505 companies currently found on the S&P 500 index, are used.
+
+The data for this exercise can be found in the file `volume_stocks.dat`. The first feature in this data file is and gives an abbreviation of the company name. The features named to are the numbers of shares traded on 1259 days within 5 recent years.
+
+-   [`volume_stocks.dat`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/volume_stocks.dat)
+
+Import the data into `R`. Be aware that the data file is tab-delimited and that the first line in the data file contains the feature names. The feature `name` (the first column) is not relevant for the analysis and should be removed. Certain companies have missing values. Remove the companies with missing values and only use the complete cases (companies). Next, store the data in a matrix.
+
+**25. Load in the data, apply non-negative matrix factorization and determine the dimension using the proportion of explained variance.**
+
+```{r}
+volume_data <- read.table("practical_03/volume_stocks.dat", header = TRUE, sep = "\t")
+volume_data <- na.omit(volume_data[, -1])
+volume_matrix <- as.matrix(volume_data)
+nmf_vol <- nmf(volume_matrix, rank = 3)
+evar(nmf_vol, volume_matrix)
+```
+
+The proportion of variance explained by the solution with three components is 0.830307, which implies that three components are sufficient to explain at least 80% of the total variance.
+
+**26. How many dimensions do you select and why? What is the proportion of variance explained for this number of dimensions?**
+
+We select three dimensions as we deem them sufficient to explain at least 80% of the total variance. 
+
+**27. Give the reconstruction error for this number of dimensions.**
+
+```{r}
+# Calculate reconstruction error
+nmf_vol@residuals
+```
+
+**28. Calculate the correlation matrix of the finally selected dimensions.**
+
+```{r}
+# Calculate correlation matrix
+cor(basis(nmf_vol))
+```
+
+## Probabilistic latent semantic analysis
+
+In this part of the assignment, probabilistic latent semantic analysis is applied to the data file `benthos.txt`. The data set consists of abundances of 10 marine species near an oilfield in the North Sea at 13 sites (the columns in the data file). The first 11 columns give the data for polluted sites. The last two columns give the data for unpolluted reference sites. Import the data into R and store the data as a matrix.
+
+-   [`benthos.txt`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/benthos.txt)
+
+**29. Carry out a probabilistic latent semantic analysis and determine the number of latent classes based on the proportion explained variance. How many classes do you select? Why?**
+
+```{r}
+benthos <- read.table("practical_03/benthos.txt", header = TRUE)
+benthos_matrix <- as.matrix(benthos)
+plsa_benthos <- fast_plsa(benthos_matrix, k = 3, symmetric = TRUE)
+```
+
+**30. Produce the three matrices ![\\boldsymbol{U}](https://latex.codecogs.com/svg.latex?%5Cboldsymbol%7BU%7D "\boldsymbol{U}"){alt="\\boldsymbol{U}"}, ![\\boldsymbol{\\Sigma}](https://latex.codecogs.com/svg.latex?%5Cboldsymbol%7B%5CSigma%7D "\boldsymbol{\Sigma}"){alt="\\boldsymbol{\\Sigma}"} and ![\\boldsymbol{V}\^\\top](https://latex.codecogs.com/svg.latex?%5Cboldsymbol%7BV%7D%5E%5Ctop "\boldsymbol{V}^\top"){alt="\\boldsymbol{V}^\\top"} for the number of latent classes selected and the corresponding matrix of estimated multinomial probabilities.**
+
+```{r}
+# Decompose the matrix using SVD or similar methods
+svd_result <- svd(benthos_matrix)
+
+# Extract matrices
+U <- svd_result$u
+Sigma <- diag(svd_result$d)
+Vt <- t(svd_result$v)
+
+# Display matrices
+list(U = U, Sigma = Sigma, Vt = Vt)
+```
