@@ -1,0 +1,183 @@
+---
+title: "Practical 05: Model Based Clustering"
+author: "Ward B. Eiling"
+date: modified-date
+format: pdf
+editor_options: 
+  chunk_output_type: inline
+---
+
+# 1 Introduction
+
+In this practical, we will apply model-based clustering on a data set of bank note measurements.
+
+We use the following packages:
+
+```{r}
+library(mclust)
+library(tidyverse)
+library(patchwork)
+```
+
+The data is built into the `mclust` package and can be loaded as a `tibble` by running the following code:
+
+```{r}
+df <- as_tibble(banknote)
+```
+
+# 2 Take-home exercises
+
+## 2.1 Data exploration
+
+**1. Read the help file of the `banknote` data set to understand what it’s all about.**
+
+```{r}
+?banknote
+```
+
+### Description
+
+The data set contains six measurements made on 100 genuine and 100 counterfeit old-Swiss 1000-franc bank notes.
+
+### Format
+
+A data frame with the following variables:
+
+Status
+
+:   the status of the banknote: `genuine` or `counterfeit`
+
+Length
+
+:   Length of bill (mm)
+
+Left
+
+:   Width of left edge (mm)
+
+Right
+
+:   Width of right edge (mm)
+
+Bottom
+
+:   Bottom margin width (mm)
+
+Top
+
+:   Top margin width (mm)
+
+Diagonal
+
+:   Length of diagonal (mm)
+
+**2. Create a scatter plot of the left (x-axis) and right (y-axis) measurements on the data set. Map the `Status` column to colour. Jitter the points to avoid overplotting. Are the classes easy to distinguish based on these features?**
+
+```{r}
+ggplot(data = df, aes(x = Left, y = Right, color = Status)) + 
+  geom_point() +
+  geom_jitter() +
+  theme_minimal()
+```
+
+Yes, we can see that the counterfeit status tends to have a greater width of the left and right edges compared to the genuine bills.
+
+**3. From now on, we will assume that we don’t have the labels. Remove the `Status` column from the data set.**
+
+```{r}
+df %>% select(-Status) -> df2
+```
+
+**4. Create density plots for all columns in the data set. Which single feature is likely to be best for clustering?**
+
+```{r}
+par(mfrow=c(2,3))
+lapply(df2, function(x) {plot(density(x))})
+colnames(df2)
+```
+
+The last feature, "diagonal" has two distinct peaks in the density plot, which suggests that it may be a good feature to find 2 clusters for. "Length" and "top" seem like bad features to cluster on, as they seem to reflect a normal distribution.
+
+## 2.2 Univariate model-based clustering
+
+**5. Use `Mclust` to perform model-based clustering with 2 clusters on the feature you chose. Assume equal variances. Name the model object `fit_E_2`. What are the means and variances of the clusters?**
+
+```{r}
+
+fit_E_2 <- Mclust(df2$Diagonal, G = 2, modelNames = "E")
+# ?Mclust()
+```
+
+**6. Use the formula from the slides and the model’s log-likelihood (`fit_E_2$loglik`) to compute the BIC for this model. Compare it to the BIC stored in the model object (`fit_E_2$bic`). Explain how many parameters (m) you used and which parameters these are.**
+
+```{r}
+(loglike <- fit_E_2$loglik)
+(BIC <- fit_E_2$bic)
+```
+
+**7. Plot the model-implied density using the `plot()` function. Afterwards, add rug marks of the original data to the plot using the `rug()` function from the base graphics system.**
+
+```{r}
+plot(fit_E_2)
+rug(df$Diagonal)
+```
+
+**8. Use `Mclust` to perform model-based clustering with 2 clusters on this feature again, but now assume *unequal* variances. Name the model object `fit_V_2`. What are the means and variances of the clusters? Plot the density again and note the differences.**
+
+```{r}
+fit_V_2 <- Mclust(df2$Diagonal, G = 2, modelNames = "V")
+plot(fit_V_2)
+rug(df$Diagonal)
+```
+
+We can clearly see that the variance of the first cluster is larger than the variance of the second cluster (with higher values on Diagonal). The model were variances were assumed to be equal did not capture this.
+
+**9. How many parameters does this model have? Name them.**
+
+```{r}
+fit_V_2$parameters
+```
+
+The model has 6 parameters: 2 means, 2 variances, and 2 mixing proportions
+
+**10. According to the deviance, which model fits better?**
+
+```{r}
+loglike
+(loglike_V <- fit_V_2$loglik)
+```
+
+Model "V" has a smaller log-likelihood, which means that model "E" fits better.
+
+**11. According to the BIC, which model is better?**
+
+```{r}
+BIC
+(BIC_V <- fit_V_2$bic)
+```
+
+The BIC of model "V" is smaller, which means that model "V" is better.
+
+# 3 Lab exercises
+
+## 3.1 Multivariate model-based clustering
+
+We will now use all available information in the data set to cluster the observations.
+
+**12. Use Mclust with all 6 features to perform clustering. Allow all model types (shapes), and from 1 to 9 potential clusters. What is the optimal model based on the BIC?**
+
+**13. How many mean parameters does this model have?**
+
+**14. Run a 2-component VVV model on this data. Create a matrix of bivariate contour (“density”) plots using the `plot()` function. Which features provide good component separation? Which do not?**
+
+**15. Create a scatter plot just like the first scatter plot in this tutorial, but map the estimated class assignments to the colour aesthetic. Map the uncertainty (part of the fitted model list) to the size aesthetic, such that larger points indicate more uncertain class assignments. Jitter the points to avoid overplotting. What do you notice about the uncertainty?**
+
+## 3.2 Challenge assignment: High-dimensional Gaussian Mixture modeling
+
+NB: this procedure is very technical and will not be tested in-depth in the exam. It is meant to give you a start in high-dimensional clustering and an example of how to explore new packages.
+
+**16. Install and load the package `HDclassif`. Read the introduction and section 4.2, parts “First results” and “PCA representation” from the associated paper [here](https://www.jstatsoft.org/article/view/v046i06).**
+
+This paper is from the Journal of Statistical Software, a very high-quality open journal describing statistical software packages. If a package has a JSS paper, always start there!
+
+**17. Run high-dimensional data clustering on the Crabs dataset using `demo("hddc")`. Choose the `EM` algorithm with `random` initialization with the `AkBkQkDk` model. Explain what happens in the plot window.**

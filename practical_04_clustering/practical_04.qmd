@@ -337,7 +337,6 @@ medians_3_clusters_small %>%
   ggtitle("K-medians clustering with 3 clusters (small differences)")
 ```
 
-
 **11. Add an input parameter `smart_init`. If this is set to `TRUE`, initialize cluster assignments using hierarchical clustering (from `hclust`). Using the unsupervised sim_df_small, look at the number of iterations needed when you use this method vs when you randomly initialize.**
 
 ```{r}

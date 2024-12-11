@@ -12,7 +12,7 @@ library(caret)
 ### 1. ------------------------------
 
 # read data
-gene_exp <- read_rds("practical_01/data/gene_expressions.rds")
+gene_exp <- read_rds("practical_01_high-dimensional-data/data/gene_expressions.rds")
 gene_exp <- as.data.frame(gene_exp)
 
 # What are the dimensions of the data?
@@ -41,7 +41,7 @@ for (i in 1:6) {
 ### 3. ------------------------------
 
 # load phenotypes.rds
-phenotypes <- read_rds("practical_01/data/phenotypes.rds") %>%
+phenotypes <- read_rds("practical_01_high-dimensional-data/data/phenotypes.rds") %>%
   select("sample", "disease")
 
 # merge gene_exp and phenotypes

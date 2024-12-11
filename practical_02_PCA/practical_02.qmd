@@ -11,7 +11,7 @@ In this exercise, the data of Example 1 from the lecture slides are used. These 
 **1. Use the function `read.table()` to import the data into R. Use the function `as.matrix()` to convert the data frame to a matrix. The two features are not centered. To center the two features the function `scale()` with the argument `scale = FALSE` can be used. Give the centered data matrix a name, for instance, `C`.**
 
 ```{r}
-Dat <- read.table("practical_02/data/Example1.dat")
+Dat <- read.table("practical_02_PCA/data/Example1.dat")
 Mat <- as.matrix(Dat)
 C <- scale(Mat, center = TRUE, scale = FALSE)
 ```

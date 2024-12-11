@@ -34,7 +34,7 @@ In this exercise, you will factor analyze the data of the places rated example g
 *Note. Since the variable names are not in the first line, use the argument `header=FALSE` in the function `read.table()`.*
 
 ```{r}
-places <- read.table("practical_03/places.txt", header = FALSE)
+places <- read.table("practical_03_ICA/places.txt", header = FALSE)
 ```
 
 **2. Factor analyze the data using the `R`-function `factanal()` with five factors, and include the argument `scores='regression'`.**
@@ -105,7 +105,7 @@ One arena in which an understanding of the hidden components which drive the sys
 *Hint:* Make sure to set `header=TRUE` and `sep = "\t"`.
 
 ```{r}
-stocks <- read.table("practical_03/close_stocks.dat", header = TRUE, sep = "\t")
+stocks <- read.table("practical_03_ICA/close_stocks.dat", header = TRUE, sep = "\t")
 ```
 
 **9. Remove the first column with the company names. Also remove the observations with missing values, and store the data in a matrix.**
@@ -149,7 +149,7 @@ In this exercise, probabilistic latent semantic analysis is applied to the data 
 **13. Read the `author.txt` data into `R` using the function `read.table()`, remove the first column with document indices, and store the data as a matrix.**
 
 ```{r}
-author <- read.table("practical_03/author.txt", header = TRUE)
+author <- read.table("practical_03_ICA/author.txt", header = TRUE)
 author_matrix <- as.matrix(author[, -1])
 ```
 
@@ -219,7 +219,7 @@ The model with the smallest χ² value and a significant p-value fits best. The 
 
 **16. How many classes do you select, based on these results?**
 
-6.
+6.  
 
 **17. Given this number of latent classes, for which latent class has document 2 the highest probability?**
 
@@ -288,12 +288,12 @@ The standardized observations in the data file `IndianSM.txt` are based on month
 
 -   [`IndianSM.txt`](https://infomda2.nl/practicals/03_dimension_reduction_2/data/IndianSM.txt)
 
-**20. Read the data into `R`, apply factor analysis and determine how many common factors are required to explain at least ![80\\](https://latex.codecogs.com/svg.latex?80%5C%25 "80\%"){alt="80\\"} of the total variance.**
+**20. Read the data into `R`, apply factor analysis and determine how many common factors are required to explain at least ![80\\](https://latex.codecogs.com/svg.latex?80%5C%25 "80%"){alt="80\\"} of the total variance.**
 
 *Note. Set the number of starting values to `200`.*
 
 ```{r}
-indian_sm <- read.table("practical_03/IndianSM.txt", header = TRUE)
+indian_sm <- read.table("practical_03_ICA/IndianSM.txt", header = TRUE)
 fa <- factanal(indian_sm, factors = 3, scores = "regression", nstart = 200)
 fa
 ```
@@ -305,7 +305,7 @@ fa
 fa$PVAL
 ```
 
-The chi square statistic is 159.32 on 33 degrees of freedom. The p-value is 1.78e-18. 
+The chi square statistic is 159.32 on 33 degrees of freedom. The p-value is 1.78e-18.
 
 **22. Give the correlations between the ‘regression’ factor scores, given the in (20.) selected number of common factors?**
 
@@ -344,7 +344,7 @@ Import the data into `R`. Be aware that the data file is tab-delimited and that 
 **25. Load in the data, apply non-negative matrix factorization and determine the dimension using the proportion of explained variance.**
 
 ```{r}
-volume_data <- read.table("practical_03/volume_stocks.dat", header = TRUE, sep = "\t")
+volume_data <- read.table("practical_03_ICA/volume_stocks.dat", header = TRUE, sep = "\t")
 volume_data <- na.omit(volume_data[, -1])
 volume_matrix <- as.matrix(volume_data)
 nmf_vol <- nmf(volume_matrix, rank = 3)
@@ -355,7 +355,7 @@ The proportion of variance explained by the solution with three components is 0.
 
 **26. How many dimensions do you select and why? What is the proportion of variance explained for this number of dimensions?**
 
-We select three dimensions as we deem them sufficient to explain at least 80% of the total variance. 
+We select three dimensions as we deem them sufficient to explain at least 80% of the total variance.
 
 **27. Give the reconstruction error for this number of dimensions.**
 
@@ -380,7 +380,7 @@ In this part of the assignment, probabilistic latent semantic analysis is applie
 **29. Carry out a probabilistic latent semantic analysis and determine the number of latent classes based on the proportion explained variance. How many classes do you select? Why?**
 
 ```{r}
-benthos <- read.table("practical_03/benthos.txt", header = TRUE)
+benthos <- read.table("practical_03_ICA/benthos.txt", header = TRUE)
 benthos_matrix <- as.matrix(benthos)
 plsa_benthos <- fast_plsa(benthos_matrix, k = 3, symmetric = TRUE)
 ```
