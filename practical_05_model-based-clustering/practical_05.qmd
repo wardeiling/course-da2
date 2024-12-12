@@ -106,14 +106,30 @@ The last feature, "diagonal" has two distinct peaks in the density plot, which s
 
 fit_E_2 <- Mclust(df2$Diagonal, G = 2, modelNames = "E")
 # ?Mclust()
+fit_E_2$parameters
 ```
+
+The mean of cluster 1 is 139.4 and 141.5 of cluster 2. The variances are equal to each other at 0.244.
 
 **6. Use the formula from the slides and the model’s log-likelihood (`fit_E_2$loglik`) to compute the BIC for this model. Compare it to the BIC stored in the model object (`fit_E_2$bic`). Explain how many parameters (m) you used and which parameters these are.**
 
 ```{r}
-(loglike <- fit_E_2$loglik)
-(BIC <- fit_E_2$bic)
+(loglike_E <- fit_E_2$loglik)
+(BIC_E <- fit_E_2$bic)
+
+
 ```
+
+```{r}
+# manual BIC
+# 1 mixing proportion, 1 variance, 2 means
+# so 4 unknown parameters
+m <- 4
+n <- nrow(df2)
+(BIC_E_manual <- - 2 * loglike_E + m * log(n))
+```
+
+This is equal to the BIC stored, except that it isn't a negative number.
 
 **7. Plot the model-implied density using the `plot()` function. Afterwards, add rug marks of the original data to the plot using the `rug()` function from the base graphics system.**
 
@@ -138,21 +154,30 @@ We can clearly see that the variance of the first cluster is larger than the var
 fit_V_2$parameters
 ```
 
-The model has 6 parameters: 2 means, 2 variances, and 2 mixing proportions
+The model has 6 parameters:
+
+-   2 means for the locations of each of the two clusters
+
+-   2 variances that determine the volume of each cluster,
+
+-   1 mixing proportion that determines the relative cluster sizes
 
 **10. According to the deviance, which model fits better?**
 
+The deviance is given by -2 times the log-likelihood.
+
 ```{r}
-loglike
-(loglike_V <- fit_V_2$loglik)
+(deviance_E <- -2 * loglike_E)
+loglike_V <- fit_V_2$loglik
+(deviance_V <- -2 * loglike_V)
 ```
 
-Model "V" has a smaller log-likelihood, which means that model "E" fits better.
+The deviance is smaller for model "V" (with unequal variances assumed), which means that model "V" fits better.
 
 **11. According to the BIC, which model is better?**
 
 ```{r}
-BIC
+BIC_E
 (BIC_V <- fit_V_2$bic)
 ```
 
@@ -166,11 +191,50 @@ We will now use all available information in the data set to cluster the observa
 
 **12. Use Mclust with all 6 features to perform clustering. Allow all model types (shapes), and from 1 to 9 potential clusters. What is the optimal model based on the BIC?**
 
+```{r}
+fit_all_features <- Mclust(df2, 
+                           modelNames = c("EII", "VII", "EEI", "EVI", "VEI", "VVI"))
+fit_all_features$BIC
+```
+
+The VEI model (diagonal, varying volume, equal shape) with 6 clusters yielded the best model fit based
+
 **13. How many mean parameters does this model have?**
+
+```{r}
+fit_all_features_VEI <- Mclust(df2, modelNames = c("VEI"), G = 6)
+fit_all_features_VEI$parameters
+```
+
+The following components are in the model
+
+-   a vector of 6 means
+
+-   6x6 covariance matrix determining shape of cluster, but we only estimate diagonal elements (variances), so this adds up to 6 parameters
+
+-   6 - 1 = 5 mixing proportion that determines the relative cluster sizes
 
 **14. Run a 2-component VVV model on this data. Create a matrix of bivariate contour (“density”) plots using the `plot()` function. Which features provide good component separation? Which do not?**
 
+```{r}
+fit_all_features_VVV <- Mclust(df2, G = 2, modelNames = "VVV")
+plot(fit_all_features_VVV)
+```
+
+Features that provide good seperation are diagonal and bottom.
+
 **15. Create a scatter plot just like the first scatter plot in this tutorial, but map the estimated class assignments to the colour aesthetic. Map the uncertainty (part of the fitted model list) to the size aesthetic, such that larger points indicate more uncertain class assignments. Jitter the points to avoid overplotting. What do you notice about the uncertainty?**
+
+```{r}
+df3 <- cbind(df2, classification= fit_all_features_VVV$classification, uncertainty = fit_all_features_VVV$uncertainty) 
+  
+ggplot(data = df3, aes(x = Left, y = Right, color = as.factor(classification), size = uncertainty)) + 
+  geom_point() +
+  geom_jitter() +
+  theme_minimal()
+```
+
+The uncertainty primarily pertains to the first cluster, with greater values on Left and Right. I would expect there to be more uncertainty in general.
 
 ## 3.2 Challenge assignment: High-dimensional Gaussian Mixture modeling
 
@@ -178,6 +242,19 @@ NB: this procedure is very technical and will not be tested in-depth in the exam
 
 **16. Install and load the package `HDclassif`. Read the introduction and section 4.2, parts “First results” and “PCA representation” from the associated paper [here](https://www.jstatsoft.org/article/view/v046i06).**
 
+```{r}
+# install.packages("HDclassif")
+library(HDclassif)
+```
+
+
 This paper is from the Journal of Statistical Software, a very high-quality open journal describing statistical software packages. If a package has a JSS paper, always start there!
 
 **17. Run high-dimensional data clustering on the Crabs dataset using `demo("hddc")`. Choose the `EM` algorithm with `random` initialization with the `AkBkQkDk` model. Explain what happens in the plot window.**
+
+```{r}
+data("Crabs")
+demo("hddc", package = "HDclassif") # 1 2 1
+```
+
+It outputs a plot of the clustering process for every iteration of the EM algorithm, which is initialized with k-means and converges after about 31-33 iterations (depending on the run). On the X-axis, we have the first principal axis and on the Y-axis, we have the second principal axis. The points are colored according to the cluster they belong to. The final solution contains 4 clusters.
