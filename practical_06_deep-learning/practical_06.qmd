@@ -5,29 +5,11 @@ format: html
 editor: visual
 ---
 
-Download manual for tensorflow and keras can be found at https://tensorflow.rstudio.com/install/.
-
 # 1 Introduction
 
 In this practical, we will create a feed-forward neural network as well as a convolutional neural network to analyze the famous MNIST dataset.
 
-Let's first install tensorflow and keras
-
-```{r}
-#| label: old method
-#| echo: false
-
-# install.packages("remotes")
-# remotes::install_github("rstudio/tensorflow")
-# reticulate::install_python()
-# library(tensorflow)
-# install_tensorflow(envname = "r-tensorflow") # fresh session first
-# install.packages("keras")
-# library(keras)
-# install_keras()
-# library(tensorflow) # confirm that succeeded
-# tf$constant("Hello TensorFlow!")
-```
+Let's first install tensorflow and keras:
 
 ```{r}
 #| label: new method
@@ -40,13 +22,12 @@ library(tidyverse)
 ```
 
 ```{r}
-library(reticulate)
-py_config()
+# library(reticulate)
+# py_config()
 # py_run_string("import requests; print(requests.get('https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz').status_code)")
 # py_run_string("import ssl; print(ssl.OPENSSL_VERSION)")
-use_virtualenv("r-keras-env", required = TRUE)
+# use_virtualenv("r-keras-env", required = TRUE)
 ```
-
 
 # 2 Take-home exercises: deep feed-forward neural network
 
@@ -58,26 +39,7 @@ In this section, we will develop a deep feed-forward neural network for MNIST.
 
 ```{r}
 mnist <- keras3::dataset_mnist(path = "practical_06_deep-learning/mnist.npz")
-# import npz file manually "mnist.npz"
-mnist <- list.files("practical_06_deep-learning/mnist.npz")
-mnist <- npz_load("practical_06_deep-learning/mnist.npz")
-py_install("openssl")
 ```
-
-```{r}
-library(reticulate)
-
-# Set the path to your MNIST file
-mnist_path <- "practical_06-deep-learning/mnist.npz"
-
-py_install(c("numpy"))
-
-# Load the data using numpy
-py_run_string(paste0(""))
-
-```
-
-Plotting is very important when working with image data. We have defined a convenient plotting function for you.
 
 **2. Use the `plot_img()` function below to plot the first training image. The `img` parameter has to be a matrix with dimensions `(28, 28)`.** NB: indexing in 3-dimensional arrays works the same as indexing in matrices, but you need an extra comma `x[,,]`.
 
@@ -87,9 +49,12 @@ plot_img <- function(img, col = gray.colors(255, start = 1, end = 0), ...) {
 }
 ```
 
-It is usually a good idea to normalize your features to have a manageable, standard range before entering them in neural networks.
+**3. As a preprocessing step, ensure the brightness values of the images in the training and test set are in the range (0, 1).**
 
-**3. As a preprocessing step, ensure the brightness values of the images in the training and test set are in the range (0, 1)**
+```{r}
+mnist$train$x <- mnist$train$x / 255
+mnist$test$x <- mnist$test$x / 255
+```
 
 ## 2.2 Multinomial logistic regression
 
@@ -98,7 +63,7 @@ The simplest model is a multinomial logistic regression model, where we have no 
 **4. Display a summary of the multinomial model using the `summary()` function. Describe why this model has 7850 parameters.**
 
 ```{r}
-multinom  <- 
+multinom <- 
   keras_model_sequential(input_shape = c(28, 28)) %>% # initialize a sequential model
   layer_flatten() %>% # flatten 28*28 matrix into single vector
   layer_dense(10, activation = "softmax") # softmax outcome == logistic regression for each of 10 outputs
@@ -110,7 +75,7 @@ multinom$compile(
 )
 ```
 
-**5. Train the model for 5 epochs using the code below. What accuracy do we obtain in the validation set?** (NB: the multinom object is changed “in-place”, which means you don’t have to assign it to another variable)
+**5. Train the model for 5 epochs using the code below. What accuracy do we obtain in the validation set?** (NB: the multinom object is changed “in-place,” which means you don’t have to assign it to another variable.)
 
 ```{r}
 multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_split = 0.2, verbose = 1)
@@ -118,50 +83,55 @@ multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_sp
 
 **6. Train the model for another 5 epochs. What accuracy do we obtain in the validation set?**
 
-## 2.3 Deep feed-forward neural networks.
+```{r}
+multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_split = 0.2, verbose = 1)
+```
+
+## 2.3 Deep feed-forward neural networks
 
 **7. Create and compile a feed-forward neural network with the following properties. Ensure that the model has 50890 parameters.**
 
--   sequential model
+- Sequential model
+- Flatten layer
+- Dense layer with 64 hidden units and “relu” activation function
+- Dense output layer with 10 units and softmax activation function
 
--   flatten layer
+You may reuse code from the multinomial model.
 
--   dense layer with 64 hidden units and “relu” activation function
+```{r}
+deep_nn <- keras_model_sequential(input_shape = c(28, 28)) %>% 
+  layer_flatten() %>% 
+  layer_dense(64, activation = "relu") %>% 
+  layer_dense(10, activation = "softmax")
 
--   dense output layer with 10 units and softmax activation function
+deep_nn$compile(
+  loss = "sparse_categorical_crossentropy",
+  optimizer = "adam",
+  metrics = c("accuracy")
+)
+```
 
-You may reuse code from the multinomial model
+**8. Train the model for 10 epochs. What do you see in terms of validation accuracy, also compared to the multinomial model?**
 
-**7. Train the model for 10 epochs. What do you see in terms of validation accuracy, also compared to the multinomial model?**
+```{r}
+deep_nn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 1)
+```
 
-**8. Create predictions for the test data using the two trained models (using the function below). Create a confusion matrix and compute test accuracy for these two models. Write down any observations you have.**
+**9. Create predictions for the test data using the two trained models. Create a confusion matrix and compute test accuracy for these two models. Write down any observations you have.**
 
 ```{r}
 class_predict <- function(model, x_train) predict(model, x = x_train) %>% apply(1, which.max) - 1
 ```
 
-**9. OPTIONAL: if you have time, create and estimate (10 epochs) a deep feed-forward model with the following properties. Compare this model to the previous models on the test data.**
-
--   sequential model
-
--   flatten layer
-
--   dense layer with 128 hidden units and “relu” activation function
-
--   dense layer with 64 hidden units and “relu” activation function
-
--   dense output layer with 10 units and softmax activation function
-
 # 3 Lab exercises: convolutional neural network
 
 Convolution layers in Keras need a specific form of data input. For each example, they need a `(width, height, channels)` array (tensor). For a colour image with 28\*28 dimension, that shape is usually `(28, 28, 3)`, where the channels indicate red, green, and blue. MNIST has no colour info, but we still need the channel dimension to enter the data into a convolution layer with shape `(28, 28, 1)`. The training dataset `x_train` should thus have shape `(60000, 28, 28, 1)`.
 
-**10. add a “channel” dimension to the training and test data using the following code. Plot an image using the first channel of the 314th training example (this is a 9).**
+**10. Add a “channel” dimension to the training and test data using the following code. Plot an image using the first channel of the 314th training example (this is a 9).**
 
 ```{r}
-# add channel dimension to input (required for convolution layers)
 dim(mnist$train$x) <- c(dim(mnist$train$x), 1)
-dim(mnist$test$x)  <- c(dim(mnist$test$x), 1)
+dim(mnist$test$x) <- c(dim(mnist$test$x), 1)
 ```
 
 **11. Create and compile a convolutional neural network using the following code. Describe the different layers in your own words.**
@@ -185,12 +155,30 @@ cnn %>%
 
 **12. Fit this model on the training data (10 epochs) and compare it to the previous models.**
 
+```{r}
+cnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 1)
+```
+
 **13. Create another CNN which has better validation performance within 10 epochs. Compare your validation accuracy to that of your peers.**
 
-Here are some things you could do:
+```{r}
+improved_cnn <- 
+  keras_model_sequential(input_shape = c(28, 28, 1)) %>% 
+  layer_conv_2d(filters = 8, kernel_size = c(3, 3), activation = "relu") %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>%
+  layer_conv_2d(filters = 16, kernel_size = c(3, 3), activation = "relu") %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>%
+  layer_flatten() %>% 
+  layer_dropout(0.5) %>% 
+  layer_dense(units = 64, activation = "relu") %>% 
+  layer_dense(10, activation = "softmax")
 
--   Reduce the convolution filter size & the pooling size and add a second convolutional & pooling layer with double the number of filters
+improved_cnn %>% 
+  compile(
+    loss = "sparse_categorical_crossentropy",
+    optimizer = "adam", 
+    metrics = c("accuracy")
+  )
 
--   Add a dropout layer after the flatten layer
-
--   Look up on the internet what works well and implement it!
+improved_cnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 1)
+```
