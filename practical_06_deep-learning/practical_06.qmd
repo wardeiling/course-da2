@@ -33,13 +33,19 @@ Let's first install tensorflow and keras
 #| label: new method
 
 # updated package "keras3"
-install.packages("keras3")
+# install.packages("keras3")
 library(keras3)
-install_keras()
+# install_keras()
 library(tidyverse)
 ```
 
-
+```{r}
+library(reticulate)
+py_config()
+# py_run_string("import requests; print(requests.get('https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz').status_code)")
+# py_run_string("import ssl; print(ssl.OPENSSL_VERSION)")
+use_virtualenv("r-keras-env", required = TRUE)
+```
 
 
 # 2 Take-home exercises: deep feed-forward neural network
@@ -51,7 +57,24 @@ In this section, we will develop a deep feed-forward neural network for MNIST.
 **1. Load the built-in MNIST dataset by running the following code. Then, describe the structure and contents of the `mnist` object.**
 
 ```{r}
-mnist <- dataset_mnist()
+mnist <- keras3::dataset_mnist(path = "practical_06_deep-learning/mnist.npz")
+# import npz file manually "mnist.npz"
+mnist <- list.files("practical_06_deep-learning/mnist.npz")
+mnist <- npz_load("practical_06_deep-learning/mnist.npz")
+py_install("openssl")
+```
+
+```{r}
+library(reticulate)
+
+# Set the path to your MNIST file
+mnist_path <- "practical_06-deep-learning/mnist.npz"
+
+py_install(c("numpy"))
+
+# Load the data using numpy
+py_run_string(paste0(""))
+
 ```
 
 Plotting is very important when working with image data. We have defined a convenient plotting function for you.
