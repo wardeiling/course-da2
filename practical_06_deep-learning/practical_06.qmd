@@ -5,14 +5,42 @@ format: html
 editor: visual
 ---
 
+Download manual for tensorflow and keras can be found at https://tensorflow.rstudio.com/install/.
+
 # 1 Introduction
 
 In this practical, we will create a feed-forward neural network as well as a convolutional neural network to analyze the famous MNIST dataset.
 
+Let's first install tensorflow and keras
+
 ```{r}
-library(tidyverse)
-library(keras)
+#| label: old method
+#| echo: false
+
+# install.packages("remotes")
+# remotes::install_github("rstudio/tensorflow")
+# reticulate::install_python()
+# library(tensorflow)
+# install_tensorflow(envname = "r-tensorflow") # fresh session first
+# install.packages("keras")
+# library(keras)
+# install_keras()
+# library(tensorflow) # confirm that succeeded
+# tf$constant("Hello TensorFlow!")
 ```
+
+```{r}
+#| label: new method
+
+# updated package "keras3"
+install.packages("keras3")
+library(keras3)
+install_keras()
+library(tidyverse)
+```
+
+
+
 
 # 2 Take-home exercises: deep feed-forward neural network
 
@@ -24,7 +52,6 @@ In this section, we will develop a deep feed-forward neural network for MNIST.
 
 ```{r}
 mnist <- dataset_mnist()
-
 ```
 
 Plotting is very important when working with image data. We have defined a convenient plotting function for you.
