@@ -1,5 +1,5 @@
 ---
-title: "Practical 8: Text Mining"
+title: "Practical 8: Natural Language Processing"
 author: "Ward B. Eiling"
 format: html
 ---
@@ -32,7 +32,7 @@ In the first part of the practical, we will apply word embedding approaches. A k
 Let’s start the word embedding part with installing the `harrypotter` package using [devtools](https://www.r-project.org/nosvn/pandoc/devtools.html). The `harrypotter` package supplies the first seven novels in the Harry Potter series. You can install and load this package with the following code:
 
 ```{r}
-devtools::install_github("bradleyboehmke/harrypotter")
+# devtools::install_github("bradleyboehmke/harrypotter")
 library(harrypotter) # Not to be confused with the CRAN palettes package
 ```
 
@@ -91,8 +91,7 @@ ids <- hp_tokens2 %>%
   select(book_chapter) %>%
   pull()
 
-tokens = word_tokenizer(tolower(hp_tokens2$word))
-it = itoken(tokens)
+it = itoken(list(hp_tokens2$word))
 vocab = create_vocabulary(it)
 vocab2 = prune_vocabulary(vocab, term_count_min = 5)
 ```
@@ -102,7 +101,7 @@ vocab2 = prune_vocabulary(vocab, term_count_min = 5)
 
 ```{r}
 # create a vocab vectorizer
-vectorizer = vocab_vectorizer(vocab)
+vectorizer = vocab_vectorizer(vocab2)
 
 # create a token co-occurrence matrix
 it2 = itoken(vocab2$term)
@@ -114,13 +113,16 @@ hp_tcm = create_tcm(it, vectorizer, skip_grams_window = 5L)
 ```{r}
 glove <- GlobalVectors$new(rank = 50, x_max = 10)
 hp_wv_main <- glove$fit_transform(hp_tcm, n_iter = 20, convergence_tol = 0.001)
+dim(hp_wv_main)
 ```
 
 **7. The GloVe model learns two sets of word vectors: main and context. Essentially they are the same since the model is symmetric. From the experience learning two sets of word vectors leads to higher quality embeddings (read more [here](http://text2vec.org/glove.html)). Best practice is to combine both the main word vectors and the context word vectors into one matrix. Extract the word vectors and save the summation of them for further questions.**
 
 ```{r}
-hp_wv_context <- glove$components$context
-hp_wv_main_context <- hp_wv_main + hp_wv_context
+hp_wv_context = glove$components
+dim(hp_wv_context)
+hp_wv_main_context = hp_wv_main + t(hp_wv_context)
+dim(hp_wv_main_context)
 ```
 
 
@@ -128,15 +130,20 @@ hp_wv_main_context <- hp_wv_main + hp_wv_context
 
 ```{r}
 # find the most similar words to "harry", "death", and "love"
-sim2(hp_wv_main_context, c("harry", "death", "love"), n = 10, method = "cosine")
+sim_words <- sim2(hp_wv_main_context, method = "cosine")
+sim_words_selected <- t(sim_words[rownames(sim_words) %in% c("harry", "death", "love"),])
+# for each column selected the second lowest value (the lowest is the word itself)
+sim_words_selected2 <- apply(sim_words_selected, 2, function(x) names(sort(x, decreasing = TRUE)[1:10]))
+sim_words_selected2
 ```
 
+The most similar word to love is "potion", for death it is "eaters" and for harry it is "ron".
 
 **9. Now you can play with word vectors! For example, add the word vector of “harry” with the word vector of “love” and subtract them from the word vector of “death”. What are the top terms in your result?**
 
 ```{r}
 # play with word vectors
-hp_wv_main_context["harry",] + hp_wv_main_context["love",] - hp_wv_main_context["death",]
+results_sim <- hp_wv_main_context["harry",] + hp_wv_main_context["love",] - hp_wv_main_context["death",]
 ```
 
 
@@ -148,10 +155,10 @@ For sentiment classification with pre-trained word vectors, we want to use [GloV
 
 ```{r}
 # Download Glove vectors if necessary
-# if (!file.exists('glove.6B.zip')) {
-#   download.file('https://nlp.stanford.edu/data/glove.6B.zip',destfile = 'glove.6B.zip')
-#   unzip('data/glove.6B.zip')
-# }
+if (!file.exists('glove.6B.zip')) {
+  download.file('https://nlp.stanford.edu/data/glove.6B.zip',destfile = 'glove.6B.zip')
+  unzip('glove.6B.zip')
+}
 ```
 
 **10. Use the code below to load the pre-trained word vectors from the file ‘glove.6B.300d.txt’ (if you have memory issues load the file ‘glove.6B.50d.txt’ instead).**
