@@ -1,47 +1,47 @@
 From: <Saved by Blink>
 Snapshot-Content-Location: https://infomda2.nl/practicals/06_model_based_clustering/practical_06_answers_24fd87.html
 Subject: Model-based clustering using mclust
-Date: Fri, 17 Jan 2025 12:48:32 +0100
+Date: Sat, 18 Jan 2025 11:23:32 +0100
 MIME-Version: 1.0
 Content-Type: multipart/related;
 	type="text/html";
-	boundary="----MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----"
+	boundary="----MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----"
 
 
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/html
-Content-ID: <frame-89F806663DD548BC7662A972A4E83926@mhtml.blink>
+Content-ID: <frame-555B41EDE11D96B0C3C24CF90F2B26B5@mhtml.blink>
 Content-Transfer-Encoding: quoted-printable
 Content-Location: https://infomda2.nl/practicals/06_model_based_clustering/practical_06_answers_24fd87.html
 
 <!DOCTYPE html><html><head><meta http-equiv=3D"Content-Type" content=3D"tex=
 t/html; charset=3DUTF-8"><link rel=3D"stylesheet" type=3D"text/css" href=3D=
-"cid:css-b1c2f53c-44d0-455f-8781-3c318e0a9220@mhtml.blink" /><link rel=3D"s=
-tylesheet" type=3D"text/css" href=3D"cid:css-84496fe6-53a1-4721-ac0b-38df0d=
-a1d6db@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"ci=
-d:css-3a250094-bf6d-4eea-9ada-7ad5e6b7843e@mhtml.blink" /><link rel=3D"styl=
-esheet" type=3D"text/css" href=3D"cid:css-df4054d0-5302-4ef9-bade-f5b04ad9b=
-0e5@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:c=
-ss-8c4a5ad5-0661-4c5a-ae76-622c3dd6035b@mhtml.blink" /><link rel=3D"stylesh=
-eet" type=3D"text/css" href=3D"cid:css-aec7b6a4-7173-4444-ad45-40aa7caf0e13=
+"cid:css-407c3cf3-6cda-4213-9a11-55479828d3f8@mhtml.blink" /><link rel=3D"s=
+tylesheet" type=3D"text/css" href=3D"cid:css-6d2ed1b6-f4e4-4840-a6ec-817d91=
+f4618d@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"ci=
+d:css-93c3838a-54d0-4430-b522-fad489a12350@mhtml.blink" /><link rel=3D"styl=
+esheet" type=3D"text/css" href=3D"cid:css-8ead1f95-213f-47ef-a7d6-342b3ae10=
+aca@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:c=
+ss-a605b379-7b6e-46f7-9c55-93308188b2db@mhtml.blink" /><link rel=3D"stylesh=
+eet" type=3D"text/css" href=3D"cid:css-34d135df-115f-477b-a353-74c22d7bea07=
 @mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-=
-b42e44ea-8121-469d-a81d-e5fad8796cfd@mhtml.blink" /><link rel=3D"stylesheet=
-" type=3D"text/css" href=3D"cid:css-b6f6e473-083e-4293-a1bd-4a81c498eba5@mh=
-tml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-242=
-0d951-7b93-4f31-bd84-a5e7dcbc8bae@mhtml.blink" /><link rel=3D"stylesheet" t=
-ype=3D"text/css" href=3D"cid:css-f55a7191-2d1a-45e6-9e59-24c43efaf367@mhtml=
-.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-ae2249=
-f1-da6a-4f9a-9527-eabb3d504e71@mhtml.blink" /><link rel=3D"stylesheet" type=
-=3D"text/css" href=3D"cid:css-3e7ec79e-8ed7-4296-9d62-72bbb3ca2d08@mhtml.bl=
-ink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-3058cc57-=
-a9ac-4fd7-865c-1e4aa87df261@mhtml.blink" /><link rel=3D"stylesheet" type=3D=
-"text/css" href=3D"cid:css-6700a38f-9da1-46d3-ac82-b8c9aedc92af@mhtml.blink=
-" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-6f745d2b-614=
-b-4bf3-8dba-9d193def5d94@mhtml.blink" /><link rel=3D"stylesheet" type=3D"te=
-xt/css" href=3D"cid:css-4b2948c8-8d36-43ba-923a-5f22288fbecf@mhtml.blink" /=
-><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-4405826f-3b5f-4=
-ab9-9464-94620d8dd64d@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/=
-css" href=3D"cid:css-0b1c0d54-b316-4f13-ab49-c4740c855794@mhtml.blink" />
+fabd99f3-30b4-47cd-bb9b-e2b1cad1ebdc@mhtml.blink" /><link rel=3D"stylesheet=
+" type=3D"text/css" href=3D"cid:css-fcd7f819-2f54-4bc4-a3c8-103ab7c8303e@mh=
+tml.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-d7f=
+7504b-a474-499a-9678-18f76ce9c9d0@mhtml.blink" /><link rel=3D"stylesheet" t=
+ype=3D"text/css" href=3D"cid:css-d7b4eebf-3769-48f8-af39-ba84ec486002@mhtml=
+.blink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-5dfe06=
+ca-8db6-4a50-9448-df09cbbce54b@mhtml.blink" /><link rel=3D"stylesheet" type=
+=3D"text/css" href=3D"cid:css-80681e9f-b010-4bce-aa1a-2379b5608b7f@mhtml.bl=
+ink" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-b85b3422-=
+c95b-4141-99fa-4a7b8e900ddd@mhtml.blink" /><link rel=3D"stylesheet" type=3D=
+"text/css" href=3D"cid:css-feb159da-debc-48d3-ad87-0e9e0d8c9aa4@mhtml.blink=
+" /><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-baf0e6fe-2a6=
+7-457b-918c-df5586575976@mhtml.blink" /><link rel=3D"stylesheet" type=3D"te=
+xt/css" href=3D"cid:css-3691ccad-c610-4067-876b-c7d70b5b359e@mhtml.blink" /=
+><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css-2f02491c-97d4-4=
+12c-b929-0e7201d1fc96@mhtml.blink" /><link rel=3D"stylesheet" type=3D"text/=
+css" href=3D"cid:css-25ad3084-62b1-4ff8-948b-88422dc1517c@mhtml.blink" />
 
 
 <meta name=3D"generator" content=3D"pandoc">
@@ -4532,13 +4532,13 @@ tabindex=3D"-1"></a><span class=3D"co"># orientation.</span></span></code><=
 
 
 
-<iframe id=3D"4h10Rzjm" frameborder=3D"0" src=3D"cid:frame-547FBF4D1A9F9367=
-5B4A84D7187DA2D4@mhtml.blink" style=3D"width: 0px; height: 0px; display: no=
+<iframe id=3D"1xxcxxn6" frameborder=3D"0" src=3D"cid:frame-18C4C8222B56C15D=
+A80F41CAE4EF7058@mhtml.blink" style=3D"width: 0px; height: 0px; display: no=
 ne;"></iframe></body></html>
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-b1c2f53c-44d0-455f-8781-3c318e0a9220@mhtml.blink
+Content-Location: cid:css-407c3cf3-6cda-4213-9a11-55479828d3f8@mhtml.blink
 
 @charset "utf-8";
 
@@ -12218,10 +12218,10 @@ px 1px 4px; }
 
 .carousel-caption h1, .carousel-caption h2, .carousel-caption h3, .carousel=
 -caption h4, .carousel-caption h5, .carousel-caption h6 { color: inherit; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-84496fe6-53a1-4721-ac0b-38df0da1d6db@mhtml.blink
+Content-Location: cid:css-6d2ed1b6-f4e4-4840-a6ec-817d91f4618d@mhtml.blink
 
 @charset "utf-8";
 
@@ -12242,10 +12242,10 @@ h6 { font-size: 12px; }
 code { color: inherit; background-color: rgba(0, 0, 0, 0.04); }
 
 pre:not([class]) { background-color: white; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-3a250094-bf6d-4eea-9ada-7ad5e6b7843e@mhtml.blink
+Content-Location: cid:css-93c3838a-54d0-4430-b522-fad489a12350@mhtml.blink
 
 @charset "utf-8";
 
@@ -12277,10 +12277,10 @@ cify-subheader { text-indent: 60px; }
 .tocify .tocify-item a, .tocify .list-group-item { padding: 5px; }
 
 .tocify .nav-pills > li { float: none; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-df4054d0-5302-4ef9-bade-f5b04ad9b0e5@mhtml.blink
+Content-Location: cid:css-8ead1f95-213f-47ef-a7d6-342b3ae10aca@mhtml.blink
 
 @charset "utf-8";
 
@@ -12344,10 +12344,10 @@ a.pagedtable-index-current:hover { text-decoration: none; font-weight: bold=
 .pagedtable-header-type { color: rgb(153, 153, 153); font-weight: 400; }
 
 .pagedtable-na-cell { font-style: italic; opacity: 0.3; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-8c4a5ad5-0661-4c5a-ae76-622c3dd6035b@mhtml.blink
+Content-Location: cid:css-a605b379-7b6e-46f7-9c55-93308188b2db@mhtml.blink
 
 @charset "utf-8";
 
@@ -12362,20 +12362,20 @@ div.column { display: inline-block; vertical-align: top; width: 50%; }
 div.hanging-indent { margin-left: 1.5em; text-indent: -1.5em; }
 
 ul.task-list { list-style: none; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-aec7b6a4-7173-4444-ad45-40aa7caf0e13@mhtml.blink
+Content-Location: cid:css-34d135df-115f-477b-a353-74c22d7bea07@mhtml.blink
 
 @charset "utf-8";
 
 code { white-space: pre; }
 
 .sourceCode { overflow: visible; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-b42e44ea-8121-469d-a81d-e5fad8796cfd@mhtml.blink
+Content-Location: cid:css-fabd99f3-30b4-47cd-bb9b-e2b1cad1ebdc@mhtml.blink
 
 @charset "utf-8";
 
@@ -12483,10 +12483,10 @@ code span.vs { color: rgb(64, 112, 160); }
 
 code span.wa { color: rgb(96, 160, 176); font-weight: bold; font-style: ita=
 lic; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-b6f6e473-083e-4293-a1bd-4a81c498eba5@mhtml.blink
+Content-Location: cid:css-fcd7f819-2f54-4bc4-a3c8-103ab7c8303e@mhtml.blink
 
 @charset "utf-8";
 
@@ -12506,10 +12506,10 @@ summary { display: list-item; }
 details > summary > p:only-child { display: inline; }
 
 pre code { padding: 0px; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-2420d951-7b93-4f31-bd84-a5e7dcbc8bae@mhtml.blink
+Content-Location: cid:css-d7f7504b-a474-499a-9678-18f76ce9c9d0@mhtml.blink
 
 @charset "utf-8";
 
@@ -12535,10 +12535,10 @@ y: inline-block; border-radius: 4px; background-color: transparent; }
 ne; }
 
 .tabset-dropdown > .nav-tabs > li { display: none; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-f55a7191-2d1a-45e6-9e59-24c43efaf367@mhtml.blink
+Content-Location: cid:css-d7b4eebf-3769-48f8-af39-ba84ec486002@mhtml.blink
 
 @charset "utf-8";
 
@@ -12571,10 +12571,10 @@ div.tocify { width: 20%; max-width: 260px; max-height: 85%; }
 .tocify-subheader .tocify-item { font-size: 0.9em; }
 
 .tocify .list-group-item { border-radius: 0px; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-ae2249f1-da6a-4f9a-9527-eabb3d504e71@mhtml.blink
+Content-Location: cid:css-5dfe06ca-8db6-4a50-9448-df09cbbce54b@mhtml.blink
 
 @charset "utf-8";
 
@@ -12584,10 +12584,10 @@ container, #credential_picker_iframe, [id*=3D"google-one-tap-iframe"], #goo=
 gle-one-tap-popup-container, .google-one-tap__module, .google-one-tap-modal=
 -div, #amp_floatingAdDiv, #ez-content-blocker-container) { display: none !i=
 mportant; min-height: 0px !important; height: 0px !important; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-3e7ec79e-8ed7-4296-9d62-72bbb3ca2d08@mhtml.blink
+Content-Location: cid:css-80681e9f-b010-4bce-aa1a-2379b5608b7f@mhtml.blink
 
 @charset "utf-8";
 
@@ -12609,10 +12609,10 @@ ght: 0; padding: 4px; }
 
 .MathJax_Hover_Arrow:hover span { background-color: rgb(204, 204, 204) !imp=
 ortant; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-3058cc57-a9ac-4fd7-865c-1e4aa87df261@mhtml.blink
+Content-Location: cid:css-b85b3422-c95b-4141-99fa-4a7b8e900ddd@mhtml.blink
 
 @charset "utf-8";
 
@@ -12688,18 +12688,18 @@ y: "Courier New", Courier; font-size: 24px; color: rgb(240, 240, 240); }
 tant; }
 
 .MathJax_MenuClose:hover:focus { outline: none; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-6700a38f-9da1-46d3-ac82-b8c9aedc92af@mhtml.blink
+Content-Location: cid:css-feb159da-debc-48d3-ad87-0e9e0d8c9aa4@mhtml.blink
 
 @charset "utf-8";
 
 .MathJax_Preview .MJXf-math { color: inherit !important; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-6f745d2b-614b-4bf3-8dba-9d193def5d94@mhtml.blink
+Content-Location: cid:css-baf0e6fe-2a67-457b-918c-df5586575976@mhtml.blink
 
 @charset "utf-8";
 
@@ -12709,10 +12709,10 @@ mportant; border: 0px !important; height: 1px !important; width: 1px !impor=
 tant; overflow: hidden !important; display: block !important; }
 
 .MJX_Assistive_MathML.MJX_Assistive_MathML_Block { width: 100% !important; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-4b2948c8-8d36-43ba-923a-5f22288fbecf@mhtml.blink
+Content-Location: cid:css-3691ccad-c610-4067-876b-c7d70b5b359e@mhtml.blink
 
 @charset "utf-8";
 
@@ -12734,10 +12734,10 @@ lid black; margin: 0px; font-weight: normal; font-style: normal; text-align=
 #MathJax_ZoomEventTrap { position: absolute; left: 0px; top: 0px; z-index: =
 302; display: inline-block; border: 0px; padding: 0px; margin: 0px; backgro=
 und-color: white; opacity: 0; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-4405826f-3b5f-4ab9-9464-94620d8dd64d@mhtml.blink
+Content-Location: cid:css-2f02491c-97d4-412c-b929-0e7201d1fc96@mhtml.blink
 
 @charset "utf-8";
 
@@ -12752,10 +12752,10 @@ lor: rgb(230, 230, 230); border: 1px solid rgb(149, 149, 149); margin: 0px;=
 z-index: 101; border: 0px; margin: 0px; padding: 0px; }
 
 .MathJax_Error { color: rgb(204, 0, 0); font-style: italic; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/css
 Content-Transfer-Encoding: quoted-printable
-Content-Location: cid:css-0b1c0d54-b316-4f13-ab49-c4740c855794@mhtml.blink
+Content-Location: cid:css-25ad3084-62b1-4ff8-948b-88422dc1517c@mhtml.blink
 
 @charset "utf-8";
 
@@ -12879,9 +12879,9 @@ nt-size: 90%; }
 
 .MathJax_PHTML .noError { font-size: 90%; text-align: left; color: black; p=
 adding: 1px 3px; border: 1px solid; }
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj----
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC----
 Content-Type: text/html
-Content-ID: <frame-547FBF4D1A9F93675B4A84D7187DA2D4@mhtml.blink>
+Content-ID: <frame-18C4C8222B56C15DA80F41CAE4EF7058@mhtml.blink>
 Content-Transfer-Encoding: quoted-printable
 Content-Location: chrome-extension://ekhagklcjbdpajgpjgmbionohlpdbjgc/translateSandbox/translateSandbox.html
 
@@ -12957,4 +12957,4 @@ t/html; charset=3DUTF-8">
 
 
 </body></html>
-------MultipartBoundary--NVlyaXbqJvE8ObzjKcFfqWEtucqj99yJyElVsnUvGj------
+------MultipartBoundary--ykZ9Y2ULy4RzrvIeZ3dDBvzG6Nk1KBwhg3vJTpDkDC------
