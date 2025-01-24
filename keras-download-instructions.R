@@ -8,7 +8,7 @@ install.packages("reticulate")
 library(reticulate)
 reticulate::install_python(version = "3.11")
 reticulate::virtualenv_create(envname = "r-reticulate", version = "3.11")
-reticulate::use_virtualenv("r-reticulate", required = TRUE)
+# reticulate::use_virtualenv("r-reticulate", required = TRUE)
 
 # Step 2: select the installed r-reticulate python interpreter in the Rstudio settings (Global Setttings, Python, Python interpreter, Virtual Environment)
 
