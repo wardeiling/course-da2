@@ -14,6 +14,7 @@ execute:
 In this practical, we are going to use the following packages to create document-term matrices on BBC news data set and apply LDA topic modeling.
 
 ```{r}
+library(here)
 library(tidyverse)
 library(tidytext)
 library(tm)
@@ -43,16 +44,18 @@ This data set consists of 2225 documents from the BBC news website corresponding
 **1. Use the code below to load the data set and inspect its first rows.**
 
 ```{r}
-load("practical_07_text-mining/news_dataset.rda")
+load(here("practical_07_text-mining/news_dataset.rda"))
 head(df_final)
 ```
 
 **2. Find out about the name of the categories and the number of observations in each of them.**
 
 ```{r}
+str(df_final)
 table(as.factor(df_final$Category))
 ```
 
+The dataset contains 2225 files, where content variable contains text data and category one of 6 categories.
 
 **3. Convert the data set into a document-term matrix and use the `findFreqTerms` function to keep the terms which their frequency is higher than 10. It is also a good idea to apply some text preprocessing before this conversion: e.g., remove non-UTF-8 characters, convert the words into lowercase, remove punctuation, numbers, stopwords, and whitespaces.**
 
@@ -68,6 +71,8 @@ dtm <- Corpus(VectorSource(df_final$Content)) %>%
   tm_map(iconv, from = "UTF-8", to = "UTF-8", sub = '') %>%
   DocumentTermMatrix(control = controls)
 
+freq_terms <- findFreqTerms(dtm, 10)
+head(freq_terms)
 ```
 
 **4. Partition the original data into training and test sets with 80% for training and 20% for test.**
@@ -82,7 +87,6 @@ test <- df_final[-train_index,]
 **5. Create separate document-term matrices for the training and the test sets using the previous frequent terms as the input dictionary and convert them into data frames.**
 
 ```{r}
-freq_terms <- findFreqTerms(dtm, 10)
 train_dtm <- dtm[train_index, colnames(dtm) %in% freq_terms]
 train_dtm_df <- as.data.frame(as.matrix(train_dtm))
 test_dtm <- dtm[-train_index, colnames(dtm) %in% freq_terms]
@@ -93,6 +97,7 @@ test_dtm_df <- as.data.frame(as.matrix(test_dtm))
 
 ```{r}
 train_dtm_y <- cbind(y = as.factor(train$Category), train_dtm_df)
+test_dtm_y <- cbind(y = as.factor(test$Category), test_dtm_df)
 ```
 
 **7. OPTIONAL: Fit a SVM model with a linear kernel on the training data set. Predict the categories for the training and test data.**
@@ -101,6 +106,22 @@ train_dtm_y <- cbind(y = as.factor(train$Category), train_dtm_df)
 svm_model <- svm(y ~ ., data = train_dtm_y, kernel = "linear")
 summary(svm_model)
 ```
+
+```{r}
+pred_svm_train <- predict(svm_model, train_dtm_y)
+(confus_train <- table(pred = pred_svm_train, true = train_dtm_y$y))
+
+sum(diag(confus_train)) / sum(confus_train)
+```
+
+```{r}
+pred_svm_train <- predict(svm_model, test_dtm_y)
+(confus_test <- table(pred = pred_svm_train, true = test_dtm_y$y))
+
+sum(diag(confus_test)) / sum(confus_test)
+```
+
+We obtain a predictive accuracy of 100% on the training set and 97.1% on the test set.
 
 # Lab exercises
 
@@ -112,15 +133,15 @@ Latent Dirichlet allocation (LDA) is a particularly popular method for fitting a
 
 ```{r}
 lda_model <- LDA(train_dtm_df, k = 5, method = "Gibbs", control = list(seed = 123))
+lda_model
 ```
-
 
 **9. The `tidy()` method is originally from the `broom` package (Robinson 2017), for tidying model objects. The `tidytext` package provides this method for extracting the per-topic-per-word probabilities, called “beta”, from the LDA model. Use this function and check the beta probabilites for each term and topic.**
 
 ```{r}
 lda_topics <- tidy(lda_model, matrix = "beta")
+head(lda_topics, 10)
 ```
-
 
 **10. Use the code below to plot the top 20 terms within each topic.**
 
@@ -139,7 +160,6 @@ lda_top_terms %>%
   scale_y_reordered()
 ```
 
-
 **11. Use the code below to save the terms and topics in a wide format.**
 
 ```{r}
@@ -151,7 +171,7 @@ beta_wide <- lda_topics %>%
   mutate(log_ratio41 = log2(topic4 / topic1))%>% 
   mutate(log_ratio51 = log2(topic5 / topic1))
 
-beta_wide
+head(beta_wide, 10)
 ```
 
 **12. Use the log ratios to visualize the words with the greatest differences between topic 1 and other topics. Below you see this analysis for topics 1 and 2.**
@@ -179,6 +199,75 @@ lda_top_terms12 %>%
   theme_minimal()
 ```
 
+```{r}
+# topic 1 versus topic 3
+lda_top_terms1 <- beta_wide %>%
+  slice_max(log_ratio31, n = 10) %>%
+  arrange(term, -log_ratio31)
+
+lda_top_terms3 <- beta_wide %>%
+  slice_max(-log_ratio31, n = 10) %>%
+  arrange(term, -log_ratio31)
+
+lda_top_terms13 <- rbind(lda_top_terms1, lda_top_terms3)
+
+# this is for ggplot to understand in which order to plot name on the x axis.
+lda_top_terms13$term <- factor(lda_top_terms13$term, levels = lda_top_terms13$term[order(lda_top_terms13$log_ratio31)])
+
+# Words with the greatest difference in beta between topic 2 and topic 1
+lda_top_terms13 %>%
+  ggplot(aes(log_ratio31, term, fill = (log_ratio31 > 0))) +
+  geom_col(show.legend = FALSE) +
+  scale_y_reordered() +
+  theme_minimal()
+```
+
+```{r}
+# topic 1 versus topic 4
+lda_top_terms1 <- beta_wide %>%
+  slice_max(log_ratio41, n = 10) %>%
+  arrange(term, -log_ratio41)
+
+lda_top_terms4 <- beta_wide %>%
+  slice_max(-log_ratio41, n = 10) %>%
+  arrange(term, -log_ratio41)
+
+lda_top_terms14 <- rbind(lda_top_terms1, lda_top_terms4)
+
+# this is for ggplot to understand in which order to plot name on the x axis.
+lda_top_terms14$term <- factor(lda_top_terms14$term, levels = lda_top_terms14$term[order(lda_top_terms14$log_ratio41)])
+
+# Words with the greatest difference in beta between topic 2 and topic 1
+lda_top_terms14 %>%
+  ggplot(aes(log_ratio41, term, fill = (log_ratio41 > 0))) +
+  geom_col(show.legend = FALSE) +
+  scale_y_reordered() +
+  theme_minimal()
+```
+
+```{r}
+# topic 1 versus topic 5
+lda_top_terms1 <- beta_wide %>%
+  slice_max(log_ratio51, n = 10) %>%
+  arrange(term, -log_ratio51)
+
+lda_top_terms5 <- beta_wide %>%
+  slice_max(-log_ratio51, n = 10) %>%
+  arrange(term, -log_ratio51)
+
+lda_top_terms15 <- rbind(lda_top_terms1, lda_top_terms5)
+
+# this is for ggplot to understand in which order to plot name on the x axis.
+lda_top_terms15$term <- factor(lda_top_terms15$term, levels = lda_top_terms15$term[order(lda_top_terms15$log_ratio51)])
+
+# Words with the greatest difference in beta between topic 2 and topic 1
+lda_top_terms15 %>%
+  ggplot(aes(log_ratio51, term, fill = (log_ratio51 > 0))) +
+  geom_col(show.legend = FALSE) +
+  scale_y_reordered() +
+  theme_minimal()
+```
+
 **13. Besides estimating each topic as a mixture of words, LDA also models each document as a mixture of topics. We can examine the per-document-per-topic probabilities, called “gamma”, with the `matrix = "gamma"` argument in the `tidy()` function. Call this function for your LDA model and save the probabilities in a variable named lda_documents.**
 
 ```{r}
@@ -188,9 +277,11 @@ lda_documents <- tidy(lda_model, matrix = "gamma")
 **14. Check the topic probabilities for documents with the index number of 1, 1000, 2000, 2225.**
 
 ```{r}
-lda_documents[lda_documents$document %in% c(1, 1000, 2000, 2225),]
+index_num <- c(1, 1000, 2000, 2225)
+for (i in index_num){
+  print(lda_documents[lda_documents$document == i,])
+}
 ```
-
 
 **15. Use the code below to visualise the topic probabilities for the example documents in question 14.**
 
@@ -205,6 +296,8 @@ lda_documents[lda_documents$document %in% c(1, 1000, 2000, 2225),] %>%
   theme_minimal()
 ```
 
+Here we can see that the topic probabilities are more evenly distributed across topics for document 2000, but show a clear preference for one topic (3) in document 1000.
+
 # Alternative LDA implementations
 
 The LDA() function in the topicmodels package is only one implementation of the latent Dirichlet allocation algorithm. For example, the mallet package (Mimno 2013) implements a wrapper around the MALLET Java package for text classification tools, and the tidytext package provides tidiers for this model output as well. The textmineR package has extensive functionality for topic modeling. You can fit Latent Dirichlet Allocation (LDA), Correlated Topic Models (CTM), and Latent Semantic Analysis (LSA) from within textmineR (https://cran.r-project.org/web/packages/textmineR/vignettes/c_topic_modeling.html).
@@ -213,4 +306,3 @@ The LDA() function in the topicmodels package is only one implementation of the 
 # library(mallet)
 # library(textmineR)
 ```
-
