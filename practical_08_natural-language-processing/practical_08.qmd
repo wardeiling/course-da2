@@ -77,6 +77,8 @@ head(hp_words)
 ```{r}
 hp_tokens <- as.data.frame(hp_words) %>%
   unnest_tokens(input = "value", output = "word", token = "words", to_lower = TRUE)
+
+head(hp_tokens)
 ```
 
 **3. Remove the stop words from the tokenized data frame.**
@@ -84,6 +86,8 @@ hp_tokens <- as.data.frame(hp_words) %>%
 ```{r}
 hp_tokens2 <- hp_tokens %>%
   anti_join(stop_words, by = "word")
+
+head(hp_tokens2)
 ```
 
 **4. Creates a vocabulary of unique terms using the create_vocabulary() function from the text2vec package and remove the words that they appear less than 5 times.**
@@ -95,9 +99,10 @@ ids <- hp_tokens2 %>%
   select(book_chapter) %>%
   pull()
 
-it = itoken(list(hp_tokens2$word))
+it = itoken(list(hp_tokens2$word)) # list command is important!
 vocab = create_vocabulary(it)
 vocab2 = prune_vocabulary(vocab, term_count_min = 5)
+vocab2
 ```
 
 **5. The next step is to create a token co-occurrence matrix (TCM). The definition of whether two words occur together is arbitrary. First create a vocab_vectorizer, then use a window of 5 for context words to create the TCM.**
@@ -109,6 +114,7 @@ vectorizer = vocab_vectorizer(vocab2)
 # create a token co-occurrence matrix
 it2 = itoken(vocab2$term)
 hp_tcm = create_tcm(it, vectorizer, skip_grams_window = 5L)
+str(hp_tcm)
 ```
 
 **6. Use the GlobalVectors as given in the code below to fit the word vectors on our data set. Choose the embedding size (rank variable) equal to 50, and the maximum number of co-occurrences equal to 10. Train word vectors in 20 iterations. You can check the full input arguments of the fit_transform function from [here](https://www.rdocumentation.org/packages/text2vec/versions/0.5.1/topics/GlobalVectors).**
@@ -116,7 +122,6 @@ hp_tcm = create_tcm(it, vectorizer, skip_grams_window = 5L)
 ```{r}
 glove <- GlobalVectors$new(rank = 50, x_max = 10)
 hp_wv_main <- glove$fit_transform(hp_tcm, n_iter = 20, convergence_tol = 0.001)
-dim(hp_wv_main)
 ```
 
 **7. The GloVe model learns two sets of word vectors: main and context. Essentially they are the same since the model is symmetric. From the experience learning two sets of word vectors leads to higher quality embeddings (read more [here](http://text2vec.org/glove.html)). Best practice is to combine both the main word vectors and the context word vectors into one matrix. Extract the word vectors and save the summation of them for further questions.**
@@ -132,14 +137,14 @@ dim(hp_wv_main_context)
 
 ```{r}
 # find the most similar words to "harry", "death", and "love"
-sim_words <- sim2(hp_wv_main_context, method = "cosine")
+sim_words <- sim2(hp_wv_main_context, method = "cosine", norm = "l2")
 sim_words_selected <- t(sim_words[rownames(sim_words) %in% c("harry", "death", "love"),])
 # for each column selected the second lowest value (the lowest is the word itself)
 sim_words_selected2 <- apply(sim_words_selected, 2, function(x) names(sort(x, decreasing = TRUE)[1:10]))
 sim_words_selected2
 ```
 
-The most similar word to love is "potion", for death it is "eaters" and for harry it is "ron".
+The most similar word to love is "potion", for death it is "eaters" and for harry it is "ron". The answers get slightly different results.
 
 **9. Now you can play with word vectors! For example, add the word vector of “harry” with the word vector of “love” and subtract them from the word vector of “death”. What are the top terms in your result?**
 
@@ -158,7 +163,7 @@ top_terms <- names(top_similar_words)[1:10]
 top_terms
 ```
 
-The top terms are "hermione", "ron" and "harry". This is not surprising as these characters are close to Harry (so +love) and far from dead (-dead).
+The top terms are "hermione", "ron" and "harry". This is not surprising as these characters are close to Harry (so +love) and far from dead (-dead). The answers get slightly different results here.
 
 # Lab exercises
 
