@@ -14,9 +14,9 @@ execute:
 In this practical, we will create a feed-forward neural network as well as a convolutional neural network to analyze the famous MNIST dataset.
 
 ```{r}
-install.packages("keras3")
+# install.packages("keras3")
 library(keras3)
-install_keras()
+# install_keras()
 ```
 
 # 2 Take-home exercises: deep feed-forward neural network
@@ -29,7 +29,12 @@ In this section, we will develop a deep feed-forward neural network for MNIST.
 
 ```{r}
 mnist <- keras3::dataset_mnist()
+str(mnist)
+range(mnist$train$x)
+table(mnist$train$y)
 ```
+
+The mnist dataset contains two lists: one for the test and one for the training set, both containing a set of features X and an outcome Y. X contains images of 28x28 pixels with integers ranging from 0-255. Y contains a single integer labelling the number displayed in each image/matrix.
 
 **2. Use the `plot_img()` function below to plot the first training image. The `img` parameter has to be a matrix with dimensions `(28, 28)`.** NB: indexing in 3-dimensional arrays works the same as indexing in matrices, but you need an extra comma `x[,,]`.
 
@@ -44,6 +49,7 @@ plot_img(mnist$train$x[1,,])
 **3. As a preprocessing step, ensure the brightness values of the images in the training and test set are in the range (0, 1).**
 
 ```{r}
+# to change the range from 0-255 to 0-1, we have to divide X by 255
 mnist$train$x <- mnist$train$x / 255
 mnist$test$x <- mnist$test$x / 255
 ```
@@ -67,17 +73,33 @@ multinom$compile(
 )
 ```
 
+```{r}
+summary(multinom)
+```
+
+The model has 7850 total parameters, because we have 28\*28= 784 input features (pixels), which gives us the output shape for the flattening layer. Subsequently, we want an output shape of 10, which implies that for each of those 784 features, we have 10 weights (parameters), with an added 10 biases (intercepts) for each output shape, forming a total of 784\*10+10 = 7850 parameters.
+
 **5. Train the model for 5 epochs using the code below. What accuracy do we obtain in the validation set?** (NB: the multinom object is changed “in-place,” which means you don’t have to assign it to another variable.)
 
 ```{r}
-multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_split = 0.2, verbose = 1)
+set.seed(123)
+multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_split = 0.2, verbose = 2)
 ```
+
+![](images/clipboard-2902341179.png)
+
+After 5 epochs, we obtain a validation accuracy of 92.76%.
 
 **6. Train the model for another 5 epochs. What accuracy do we obtain in the validation set?**
 
 ```{r}
-multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_split = 0.2, verbose = 1)
+set.seed(123)
+multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_split = 0.2, verbose = 2)
 ```
+
+![](images/clipboard-171218867.png)
+
+We obtain a validation accuracy of 93.14%, which is a little bit higher. However, we can see that it barely increases over the epochs.
 
 ## 2.3 Deep feed-forward neural networks
 
@@ -88,32 +110,57 @@ multinom %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 5, validation_sp
 -   Dense layer with 64 hidden units and “relu” activation function
 -   Dense output layer with 10 units and softmax activation function
 
+Then we have (784\* 64 + 64) + (64 \* 10 + 10) parameters
+
 You may reuse code from the multinomial model.
 
 ```{r}
-deep_nn <- keras_model_sequential(input_shape = c(28, 28)) %>% 
+dffnn <- keras_model_sequential(input_shape = c(28, 28)) %>% 
   layer_flatten() %>% 
   layer_dense(64, activation = "relu") %>% 
   layer_dense(10, activation = "softmax")
 
-deep_nn$compile(
+dffnn$compile(
   loss = "sparse_categorical_crossentropy",
   optimizer = "adam",
-  metrics = c("accuracy")
+  metrics = list("accuracy")
 )
+```
+
+```{r}
+summary(dffnn)
 ```
 
 **8. Train the model for 10 epochs. What do you see in terms of validation accuracy, also compared to the multinomial model?**
 
 ```{r}
-deep_nn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 1)
+dffnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 2)
 ```
+
+![](images/clipboard-3176299648.png)
+
+The accuracy of the DFFNN is quite a bit higher compared to the multinomial single layered model: after 10 epochs we obtain a validation accuracy of 97.15% on the test set. However, note that we are using a much greater number of parameters now.
 
 **9. Create predictions for the test data using the two trained models. Create a confusion matrix and compute test accuracy for these two models. Write down any observations you have.**
 
 ```{r}
 class_predict <- function(model, x_train) predict(model, x = x_train) %>% apply(1, which.max) - 1
 ```
+
+```{r}
+pred_multinom <- class_predict(multinom, x = mnist$test$x)
+pred_dffnn <- class_predict(dffnn, x = mnist$test$x)
+
+(confus_multinom <- table(pred = pred_multinom, true = mnist$test$y))
+(confus_dffnn <- table(pred = pred_dffnn, true = mnist$test$y))
+```
+
+```{r}
+(test_acc_multinom <- sum(diag(confus_multinom)) / sum(confus_multinom))
+(test_acc_dffnn <- sum(diag(confus_dffnn)) / sum(confus_multinom))
+```
+
+Similar to the validation accuracy results, we see substantially superior predictive performance on the test set by the DFFNN compared to the less deep multinomial model.
 
 # 3 Lab exercises: convolutional neural network
 
@@ -124,6 +171,10 @@ Convolution layers in Keras need a specific form of data input. For each example
 ```{r}
 dim(mnist$train$x) <- c(dim(mnist$train$x), 1)
 dim(mnist$test$x) <- c(dim(mnist$test$x), 1)
+```
+
+```{r}
+plot_img(mnist$train$x[314,,,1])
 ```
 
 **11. Create and compile a convolutional neural network using the following code. Describe the different layers in your own words.**
@@ -145,11 +196,25 @@ cnn %>%
   )
 ```
 
+```{r}
+summary(cnn)
+```
+
+The first layer is a convolutional layer with 6 filters, where each filter size is 5x5, implying that parameters are shared across these blocks. Subsequently, we have a pooling layer with max pool to reduce dimensionality of each of the 6 maps from 24x24 to 6x6, thus reducing their size by 4 in each direction. Then we flatten the array, after which there is a hidden dense layer with 32 units and ReLu activation function, followed by an output layer with 10 units and softmax activation function.
+
 **12. Fit this model on the training data (10 epochs) and compare it to the previous models.**
 
 ```{r}
-cnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 1)
+cnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 2)
+
+pred_cnn <- class_predict(cnn, x = mnist$test$x)
+(confus_cnn <- table(pred = pred_cnn, true = mnist$test$y))
+sum(diag(confus_cnn)) / sum(confus_cnn)
 ```
+
+![](images/clipboard-2929845679.png)
+
+After 10 epochs the CNN obtains a validation accuracy of 98.72% and a test set accuracy of 98.27%, exceeding both the multinomial single layer model and the DFFNN. Noteworthy, it has much less parameters than the DFFNN, through parameter sharing in the filters, potentially resulting in less overfitting, while still making this all the more impressive.
 
 **13. Create another CNN which has better validation performance within 10 epochs. Compare your validation accuracy to that of your peers.**
 
@@ -172,5 +237,15 @@ improved_cnn %>%
     metrics = c("accuracy")
   )
 
-improved_cnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 1)
+improved_cnn %>% fit(x = mnist$train$x, y = mnist$train$y, epochs = 10, validation_split = 0.2, verbose = 2)
 ```
+
+![](images/clipboard-929212440.png)
+
+```{r}
+pred_cnn_imp <- class_predict(improved_cnn, x = mnist$test$x)
+(confus_cnn_imp <- table(pred = pred_cnn_imp, true = mnist$test$y))
+sum(diag(confus_cnn_imp)) / sum(confus_cnn_imp)
+```
+
+The test set accuracy is 98.86%, which is a slight improvements over the simpler CNN model.
