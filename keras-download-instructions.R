@@ -1,6 +1,7 @@
 # Let's set up a virtual python environment with reticulate and  
 # install keras3 (incl tensorflow) from scratch. In other words,
 # it is important that you do not have any python environments.
+# Also, it may be necessary to run Rstudio as administrator.
 
 # Step 1: install Reticulate, install python 3.11 (not the newest version!) and create virtual environment
 
@@ -16,7 +17,12 @@ reticulate::virtualenv_create(envname = "r-reticulate", version = "3.11")
 
 install.packages("keras3")
 library(keras3)
-install_keras()
+install_keras(
+  envname = "r-keras",
+  backend = c("tensorflow"),
+  gpu = FALSE, # with GPU it may be more prone to failure as it requires additional installations
+  restart_session = TRUE
+)
 
 # Step 4: Select the new r-keras virtual environment in the python interpreter Rstudio settings
 

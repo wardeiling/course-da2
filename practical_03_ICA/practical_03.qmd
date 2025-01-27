@@ -1,8 +1,12 @@
 ---
-title: "Practical 03"
+title: "Practical 3: Dimension Reduction 2"
 author: "Ward B. Eiling"
-format: pdf
-editor: visual
+format: 
+  html:
+    self-contained: true
+execute:
+  warning: false
+  message: false
 ---
 
 # Take home exercises
@@ -10,17 +14,18 @@ editor: visual
 **Load required packages.**
 
 ```{r}
-# install.packages("fastICA") 
-# install.packages("BiocManager") 
-# BiocManager::install("Biobase") 
-# install.packages("NMF") 
-# install.packages("svs") 
+# install.packages("fastICA")
+# install.packages("BiocManager")
+# BiocManager::install("Biobase")
+# install.packages("NMF")
+# install.packages("svs")
 ```
 
 ```{r}
 library(fastICA) 
 library(NMF) 
 library(svs) 
+library(here)
 ```
 
 ## Factor analysis
@@ -34,13 +39,13 @@ In this exercise, you will factor analyze the data of the places rated example g
 *Note. Since the variable names are not in the first line, use the argument `header=FALSE` in the function `read.table()`.*
 
 ```{r}
-places <- read.table("practical_03_ICA/places.txt", header = FALSE)
+places <- read.table(here("practical_03_ICA/places.txt"), header = FALSE)
 ```
 
 **2. Factor analyze the data using the `R`-function `factanal()` with five factors, and include the argument `scores='regression'`.**
 
 ```{r}
-fa_result <- factanal(places, factors = 5, scores = "regression")
+fa_result <- factanal(places, factors = 5, scores = "regression", rotation = "varimax") # uses varimax (orthogonal rotation) by default
 fa_result
 ```
 
@@ -50,7 +55,7 @@ fa_result
 cor(fa_result$scores)
 ```
 
-The correlations should be near zero if the factors are orthogonal. Otherwise, they indicate interdependence among factors, potentially conflicting with the assumption of independence.
+By employing orthogonal (varimax) rotation with the common factor model, we *assume* that the factors are orthogonal to one another. However, orthogonal methods *do not make* factors uncorrelated (Fabrigar & Wegener, 2011). Thus, when using this rotation method, you could still end up with factors that are correlated when you somehow estimate their correlations, as we show here. Thus, the interdependence among factors conflicts with the assumption. However, none of the correlations exceed 0.12, indicating that the relatedness is quite minimal. If this were higher, it may indicate the presence of another factor.
 
 ## Independent component analysis
 
@@ -84,15 +89,15 @@ e <- c(ica$S %*% ica$A)
 cor(places, ica$S)
 ```
 
-High correlations for some components suggest strong relationships between original variables and these components.
+High correlations for some components suggest strong relationships between original variables/features and these components.
 
 **7. Now calculate the correlations among the components. Are they as you expect?**
 
 ```{r}
-cor(ica$S)
+round(cor(ica$S), 10)
 ```
 
-Ideally, these should be close to zero, reflecting the independence assumption in ICA.
+The correlations between components are very close to zero, reflecting the independence assumption in ICA.
 
 ## Non-negative matrix factorization
 
@@ -105,7 +110,7 @@ One arena in which an understanding of the hidden components which drive the sys
 *Hint:* Make sure to set `header=TRUE` and `sep = "\t"`.
 
 ```{r}
-stocks <- read.table("practical_03_ICA/close_stocks.dat", header = TRUE, sep = "\t")
+stocks <- read.table(here("practical_03_ICA/close_stocks.dat"), header = TRUE, sep = "\t")
 ```
 
 **9. Remove the first column with the company names. Also remove the observations with missing values, and store the data in a matrix.**
@@ -135,10 +140,10 @@ evar(nmf_3, stocks_matrix)
 **12. Calculate the correlations between the features according to the model of your choice. Are they highly correlated?**
 
 ```{r}
-chosen_model <- nmf_3  # Assuming we choose 3 components
-H <- basis(chosen_model)
-cor(stocks_matrix, H)
+cor(nmf_3@fit@W)
 ```
+
+Yes the correlations between the features are very high, ranging from 0.7 to 0.81.
 
 ## Probabilistic latent semantic analysis
 
@@ -149,7 +154,7 @@ In this exercise, probabilistic latent semantic analysis is applied to the data 
 **13. Read the `author.txt` data into `R` using the function `read.table()`, remove the first column with document indices, and store the data as a matrix.**
 
 ```{r}
-author <- read.table("practical_03_ICA/author.txt", header = TRUE)
+author <- read.table(here("practical_03_ICA/author.txt"), header = TRUE)
 author_matrix <- as.matrix(author[, -1])
 ```
 
@@ -170,10 +175,9 @@ The output of the function `fast_plsa()` outputs a list with three elements, `pr
 The Pearson’s ![\\chi\^2](https://latex.codecogs.com/svg.latex?%5Cchi%5E2 "\chi^2"){alt="\\chi^2"}-statistic requires the estimated multinomial probabilities ![\\hat{\\boldsymbol{P}}=\\boldsymbol{U\\Sigma V\^\\top}](https://latex.codecogs.com/svg.latex?%5Chat%7B%5Cboldsymbol%7BP%7D%7D%3D%5Cboldsymbol%7BU%5CSigma%20V%5E%5Ctop%7D "\hat{\boldsymbol{P}}=\boldsymbol{U\Sigma V^\top}"){alt="\\hat{\\boldsymbol{P}}=\\boldsymbol{U\\Sigma V^\\top}"}, which can be obtained as follows.
 
 ```{r}
-#| eval: false
 # put the output of fast_plsa() in a list
 plsa <- list(plsa_4, plsa_5, plsa_6)
-P <- lapply(plsa, function(x) x$prob1 %*% diag(x$prob0) %*% t(x$prob2)) 
+P <- lapply(plsa, function(x) x$prob1 %*% diag(x$prob0) %*% t(x$prob2))
 ```
 
 *Note. `plsa` is a list with three elements: the output of `fast_plsa()` for 4, 5, and 6 components.*
@@ -181,45 +185,29 @@ P <- lapply(plsa, function(x) x$prob1 %*% diag(x$prob0) %*% t(x$prob2))
 From these probabilities, we can compute the Pearson’s ![\\chi\^2](https://latex.codecogs.com/svg.latex?%5Cchi%5E2 "\chi^2"){alt="\\chi^2"}-statistic or the Likelihood-ratio statistic.
 
 ```{r}
-#| eval: false
-Xsq <- sapply(P, function(x) sum((author - sum(author)*x)^2 / (sum(author)*x))) 
-Gsq <- sapply(P, function(x) 2*sum(log((author/(sum(author)*x))^author)))
+Xsq <- sapply(P, function(x) sum((author_matrix - sum(author_matrix)*x)^2 / (sum(author_matrix)*x)))
+Gsq <- sapply(P, function(x) 2*sum(log((author_matrix/(sum(author_matrix)*x))^author_matrix)))
 ```
 
 Lastly, we need the degrees of freedom, which is the number of cells minus the number of parameters estimated. The number of cells is the number of rows times the number of columns, and the number of parameters is equal to the number of components, times the sum of the number of rows and the number of columns minus one.
 
 ```{r}
-#| eval: false
-N <- nrow(author) 
-p <- ncol(author) 
+N <- nrow(author_matrix) 
+p <- ncol(author_matrix)
+r <- c(4,5,6)
 df <- N*p - r*(N+p-1) 
 ```
 
 Accordingly, we can calculate the ![p](https://latex.codecogs.com/svg.latex?p "p"){alt="p"}-value as follows.
 
 ```{r}
-#| eval: false
 1-pchisq(Xsq, df) 
 # [1] 0.000000e+00 2.220446e-16 1.410538e-12 
 ```
 
-We can turn this into a function
-
-```{r}
-P <- lapply(list(plsa_4, plsa_5, plsa_6), function(x) {
-  x$prob1 %*% diag(x$prob0) %*% t(x$prob2)
-})
-Xsq <- sapply(P, function(p) sum((author_matrix - sum(author_matrix) * p)^2 / (sum(author_matrix) * p)))
-df <- nrow(author_matrix) * ncol(author_matrix) - c(4, 5, 6) * (nrow(author_matrix) + ncol(author_matrix) - 1)
-p_vals <- 1 - pchisq(Xsq, df)
-p_vals
-```
-
-The model with the smallest χ² value and a significant p-value fits best. The model with 6 components has the smallest χ² value and a significant p-value. Consequently, this model fits best.
-
 **16. How many classes do you select, based on these results?**
 
-6.  
+The model with the smallest χ² value and a significant p-value fits best, which is the model with 6 components. Therefore, we continue with this model.
 
 **17. Given this number of latent classes, for which latent class has document 2 the highest probability?**
 
@@ -227,7 +215,7 @@ The model with the smallest χ² value and a significant p-value fits best. The 
 plsa_6$prob1[2, ]
 ```
 
-On the basis of the probabilities, document 2 is most likely to belong to class 6.
+Document 2 has the highest probability for latent class 1, so it is most likely to belong to this class.
 
 **18. Which letter occurs the most for almost all classes?**
 
@@ -240,17 +228,12 @@ the letter "e".
 **19. Determine for the finally selected number of classes the proportion of explained variance by executing the following lines.**
 
 ```{r}
-evar(plsa_6$prob1, author_matrix)
-
-# prepare variables
-P <- lapply(plsa, function(x) x$prob1 %*% diag(x$prob0) %*% t(x$prob2)) 
-
-# x <- c(author)
-# e <- c(sum(author) * P[[3]])
-# (2 * crossprod(x, e) - crossprod(e))/crossprod(x)
-
-# code didn't work, so I used evar
+x <- c(author_matrix)
+e <- c(sum(author_matrix) * P[[3]])
+(2 * crossprod(x, e) - crossprod(e))/crossprod(x)
 ```
+
+The proportion of explained variance for the 6 class model is 99.85%, which is very high.
 
 # Lab exercises
 
@@ -293,10 +276,12 @@ The standardized observations in the data file `IndianSM.txt` are based on month
 *Note. Set the number of starting values to `200`.*
 
 ```{r}
-indian_sm <- read.table("practical_03_ICA/IndianSM.txt", header = TRUE)
+indian_sm <- read.table(here("practical_03_ICA/IndianSM.txt"), header = TRUE)
 fa <- factanal(indian_sm, factors = 3, scores = "regression", nstart = 200)
 fa
 ```
+
+we need at least three factors to account for more than 80% of the variance.
 
 **21. Does the factor model with the number of factors chosen in (20.) fit the data? Why**
 
@@ -305,7 +290,7 @@ fa
 fa$PVAL
 ```
 
-The chi square statistic is 159.32 on 33 degrees of freedom. The p-value is 1.78e-18.
+The chi square statistic is 159.32 on 33 degrees of freedom. The p-value is 1.78e-18, meaning that we reject the null hypothesis of good model fit, indicating that there is substantial misfit and that we should probably add more factors.
 
 **22. Give the correlations between the ‘regression’ factor scores, given the in (20.) selected number of common factors?**
 
@@ -314,22 +299,31 @@ The chi square statistic is 159.32 on 33 degrees of freedom. The p-value is 1.78
 cor(fa$scores)
 ```
 
+While the correlations are not precisely zero, they are very close.
+
 **23. Carry out an independent component analysis and determine the number of independent components. How many independent components do you select? Why?**
 
 ```{r}
-# Perform ICA with 3 components
-ica_india <- fastICA(indian_sm, n.comp = 3)
+ica <- lapply(1:8, function(i) fastICA(indian_sm, i))
+pve <- sapply(ica, function(i) {
+  obs <- c(unlist(indian_sm))
+  fit <- c(i$S %*% i$A)
+  (2*crossprod(obs, fit) - crossprod(fit))/crossprod(obs)
+})
 
-# Evaluate number of components based on kurtosis or explained variance
-summary(ica_india)
+pve
 ```
+
+We again need three components to reach 80% of variance explained. After the third and especially the fourth factor, the added variance explained is quite small. Thus, we continue with three independent components.
 
 **24. Give the correlations between the features (macro-economic variables) and the independent components. Use these correlations to interpret the independent components.**
 
 ```{r}
 # Compute correlations between macroeconomic variables and ICA components
-cor(indian_sm, ica_india$S)
+cor(indian_sm, ica[[3]]$S)
 ```
+
+CMR and Repo have very high correlations with the first component; MS, CPI, GP, COP, FER and BOT have very high correlations with the second component; and FDI, ER and IGR have very high correlations with the third component. This may tell us something about the underlying data generating mechanism.
 
 ## Non-negative matrix factorization
 
@@ -344,32 +338,43 @@ Import the data into `R`. Be aware that the data file is tab-delimited and that 
 **25. Load in the data, apply non-negative matrix factorization and determine the dimension using the proportion of explained variance.**
 
 ```{r}
-volume_data <- read.table("practical_03_ICA/volume_stocks.dat", header = TRUE, sep = "\t")
-volume_data <- na.omit(volume_data[, -1])
-volume_matrix <- as.matrix(volume_data)
-nmf_vol <- nmf(volume_matrix, rank = 3)
-evar(nmf_vol, volume_matrix)
-```
+vs <- read.table(here("practical_03_ICA/volume_stocks.dat"), header = TRUE, sep = "\t")
+vs <- na.omit(vs[,-1]) |> as.matrix()
 
-The proportion of variance explained by the solution with three components is 0.830307, which implies that three components are sufficient to explain at least 80% of the total variance.
+cl <- parallel::makeCluster(10)
+parallel::clusterExport(cl, varlist = c("vs"))
+NMF <- pbapply::pblapply(1:10, function(i) NMF::nmf(vs, i), cl = cl)
+parallel::stopCluster(cl)
+
+sapply(NMF, function(x) evar(x, vs))
+```
 
 **26. How many dimensions do you select and why? What is the proportion of variance explained for this number of dimensions?**
 
-We select three dimensions as we deem them sufficient to explain at least 80% of the total variance.
+Since the amount of explained variance increases only slightly with more than 1 factor, we would ordinarily continue with a one-factor model. However, here we continue with the two factor model for the sake of the exercises, which explains more than 80% of the variance, or to be precise 81.26%.
+
+```{r}
+mod <- NMF[[2]]
+evar(mod, vs)
+```
 
 **27. Give the reconstruction error for this number of dimensions.**
 
 ```{r}
 # Calculate reconstruction error
-nmf_vol@residuals
+sum((vs - mod@fit@W %*% mod@fit@H)^2)
 ```
+
+The reconstruction error is extremely large for the two factor model.
 
 **28. Calculate the correlation matrix of the finally selected dimensions.**
 
 ```{r}
 # Calculate correlation matrix
-cor(basis(nmf_vol))
+cor(mod@fit@W)
 ```
+
+The correlations between factors are moderate to high, ranging from 0.5 to 0.70.
 
 ## Probabilistic latent semantic analysis
 
@@ -380,22 +385,36 @@ In this part of the assignment, probabilistic latent semantic analysis is applie
 **29. Carry out a probabilistic latent semantic analysis and determine the number of latent classes based on the proportion explained variance. How many classes do you select? Why?**
 
 ```{r}
-benthos <- read.table("practical_03_ICA/benthos.txt", header = TRUE)
-benthos_matrix <- as.matrix(benthos)
-plsa_benthos <- fast_plsa(benthos_matrix, k = 3, symmetric = TRUE)
+benthos <- read.table(here("practical_03_ICA/benthos.txt"), header = TRUE)
+benthos <- as.matrix(benthos)
+
+cl <- parallel::makeCluster(10)
+parallel::clusterExport(cl, varlist = c("benthos"))
+plsa <- pbapply::pblapply(1:12, function(i) svs::fast_plsa(benthos, i, symmetric = TRUE), cl=cl)
+parallel::stopCluster(cl)
+
+sapply(plsa, function(k) {
+  x <- c(benthos)
+  xhat <- sum(x) * c(k$prob1 %*% diag(k$prob0) %*% t(k$prob2))
+  (2*crossprod(x, xhat) - crossprod(xhat))/crossprod(x)
+})
+
 ```
+
+Based on the proportion of variance, we would continue with a three-class solution as this explains more than 97% of the variance. Since adding more classes does not increase the explained variance by much, this would not make sense.
 
 **30. Produce the three matrices ![\\boldsymbol{U}](https://latex.codecogs.com/svg.latex?%5Cboldsymbol%7BU%7D "\boldsymbol{U}"){alt="\\boldsymbol{U}"}, ![\\boldsymbol{\\Sigma}](https://latex.codecogs.com/svg.latex?%5Cboldsymbol%7B%5CSigma%7D "\boldsymbol{\Sigma}"){alt="\\boldsymbol{\\Sigma}"} and ![\\boldsymbol{V}\^\\top](https://latex.codecogs.com/svg.latex?%5Cboldsymbol%7BV%7D%5E%5Ctop "\boldsymbol{V}^\top"){alt="\\boldsymbol{V}^\\top"} for the number of latent classes selected and the corresponding matrix of estimated multinomial probabilities.**
 
 ```{r}
-# Decompose the matrix using SVD or similar methods
-svd_result <- svd(benthos_matrix)
-
-# Extract matrices
-U <- svd_result$u
-Sigma <- diag(svd_result$d)
-Vt <- t(svd_result$v)
+U <- plsa[[3]]$prob1
+Sigma <- diag(plsa[[2]]$prob0)
+Vt <- t(plsa[[2]]$prob2)
 
 # Display matrices
 list(U = U, Sigma = Sigma, Vt = Vt)
+```
+
+```{r}
+# list matrix of estimated multinomial probabilities
+plsa[[2]]$prob1 %*% diag(plsa[[2]]$prob0) %*% t(plsa[[2]]$prob2)
 ```

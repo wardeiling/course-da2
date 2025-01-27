@@ -1,7 +1,12 @@
 ---
-title: "Practical 07: Text Mining"
+title: "Practical 7: Text Mining 1"
 author: "Ward B. Eiling"
-format: html
+format: 
+  html:
+    self-contained: true
+execute:
+  warning: false
+  message: false
 ---
 
 # Introduction

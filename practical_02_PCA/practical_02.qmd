@@ -1,8 +1,17 @@
 ---
-title: "practical_02"
+title: "Practical 2: Principal Component Analysis"
 author: "Ward B. Eiling"
-format: html
+format: 
+  html:
+    self-contained: true
+execute:
+  warning: false
+  message: false
 ---
+
+```{r}
+library(here)
+```
 
 ## Take home exercises
 
@@ -11,7 +20,7 @@ In this exercise, the data of Example 1 from the lecture slides are used. These 
 **1. Use the function `read.table()` to import the data into R. Use the function `as.matrix()` to convert the data frame to a matrix. The two features are not centered. To center the two features the function `scale()` with the argument `scale = FALSE` can be used. Give the centered data matrix a name, for instance, `C`.**
 
 ```{r}
-Dat <- read.table("practical_02_PCA/data/Example1.dat")
+Dat <- read.table(here("practical_02_PCA/data/Example1.dat"))
 Mat <- as.matrix(Dat)
 C <- scale(Mat, center = TRUE, scale = FALSE)
 ```
@@ -50,6 +59,9 @@ svd_output <- svd(C)
 **6. Plot the scores on the second principal component (y-axis) against the scores on the first principal component (x-axis) and let the range of the x-axis run from -18 to 18 and the range of the y-axis from -16 to 16.**
 
 ```{r}
+#| fig-height: 5
+#| fig-width: 5
+
 pc1 <- lambda_hat[,1]
 pc2 <- lambda_hat[,2]
 plot(pc1,pc2 , xlim = c(-18, 18), ylim = c(-16, 16))
@@ -57,14 +69,18 @@ plot(pc1,pc2 , xlim = c(-18, 18), ylim = c(-16, 16))
 
 **7. Use the function `eigen()` to apply an eigendecomposition to the sample covariance matrix.**
 
+Note that an alternative form of the eigendecomposition of the covariance matrix ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"} is given by
+
+$$
+\mathbf{S}= \sum^p_{j =1}\delta_j \mathbf{v}_j \mathbf{v}_j^T
+$$
+
+where ![\\mathbf{v}\_{j}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7Bv%7D_%7Bj%7D "\mathbf{v}_{j}"){alt="\\mathbf{v}_{j}"} is the ![j](https://latex.codecogs.com/svg.latex?j "j"){alt="j"}th eigenvector of ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"}. From this alternative form it is clear that the (ortho-normal) eigenvectors are only defined up to sign because ![\\mathbf{v}\_{j}\\mathbf{v}\_{j}\^{T}=-\\mathbf{v}\_{j}(-\\mathbf{v}\_{j}\^{T})](https://latex.codecogs.com/svg.latex?%5Cmathbf%7Bv%7D_%7Bj%7D%5Cmathbf%7Bv%7D_%7Bj%7D%5E%7BT%7D%3D-%5Cmathbf%7Bv%7D_%7Bj%7D%28-%5Cmathbf%7Bv%7D_%7Bj%7D%5E%7BT%7D%29 "\mathbf{v}_{j}\mathbf{v}_{j}^{T}=-\mathbf{v}_{j}(-\mathbf{v}_{j}^{T})"){alt="\\mathbf{v}_{j}\\mathbf{v}_{j}^{T}=-\\mathbf{v}_{j}(-\\mathbf{v}_{j}^{T})"}. This may lead to differences in sign in the output.
+
 ```{r}
 (delta <- eigen(S))
 (eigen_val <- delta$values)
 ```
-
-Note that an alternative form of the eigendecomposition of the covariance matrix ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"} is given by
-
-where ![\\mathbf{v}\_{j}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7Bv%7D_%7Bj%7D "\mathbf{v}_{j}"){alt="\\mathbf{v}_{j}"} is the ![j](https://latex.codecogs.com/svg.latex?j "j"){alt="j"}th eigenvector of ![\\mathbf{S}](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BS%7D "\mathbf{S}"){alt="\\mathbf{S}"}. From this alternative form it is clear that the (ortho-normal) eigenvectors are only defined up to sign because ![\\mathbf{v}\_{j}\\mathbf{v}\_{j}\^{T}=-\\mathbf{v}\_{j}(-\\mathbf{v}\_{j}\^{T})](https://latex.codecogs.com/svg.latex?%5Cmathbf%7Bv%7D_%7Bj%7D%5Cmathbf%7Bv%7D_%7Bj%7D%5E%7BT%7D%3D-%5Cmathbf%7Bv%7D_%7Bj%7D%28-%5Cmathbf%7Bv%7D_%7Bj%7D%5E%7BT%7D%29 "\mathbf{v}_{j}\mathbf{v}_{j}^{T}=-\mathbf{v}_{j}(-\mathbf{v}_{j}^{T})"){alt="\\mathbf{v}_{j}\\mathbf{v}_{j}^{T}=-\\mathbf{v}_{j}(-\\mathbf{v}_{j}^{T})"}. This may lead to differences in sign in the output.
 
 **8. Check whether the eigenvalues are equal to the variances of the two principal components. Be aware that the R-base function `var()` takes ![N-1](https://latex.codecogs.com/svg.latex?N-1 "N-1"){alt="N-1"} in the denominator, to get an unbiased estimate of the variance.**
 
@@ -165,10 +181,10 @@ So 88.9% of the total variance in the features.
 **12. Make a scree-plot. How many principal components should be extracted according to the scree-plot?**
 
 ```{r}
-plot(eigen_val)
+plot(eigen_val, type = "l")
 ```
 
-according to the scree plot, I would extract 1 principal component as when we draw a line and look at which values remain before the elbow, only the first one remains.
+According to the scree plot, I would extract 1 principal component as when we draw a line and look at which values remain before the elbow, only the first one remains.
 
 **13. How much of the total variance does this number of extracted principal components explain?**
 
@@ -213,7 +229,9 @@ Note that the units used vary and occupy different scales.
 First, the principal components will be computed. Because PCA works best with numerical data, you’ll exclude the two categorical variables (vs and am; columns 8 and 9). You are left with a matrix of 9 columns and 32 rows, which you pass to the `prcomp()` function, assigning your output to `mtcars.pca`. You will also set two arguments, `center` and `scale`, to be `TRUE`. This is done to apply a principal component analysis to the standardized features. So, execute
 
 ```{r}
-mtcars.pca <- prcomp(mtcars[, c(1:7, 10, 11)],                      center = TRUE, scale = TRUE)
+mtcars.pca <- prcomp(mtcars[, c(1:7, 10, 11)],                      
+                     center = TRUE, 
+                     scale = TRUE)
 ```
 
 **15. Have a peek at the PCA object with `summary()`.**
@@ -246,6 +264,11 @@ The PCA object `mtcars.pca` contains the following information:
 
 **18. Determine the eigenvalues. How many principal components should be extracted according to the eigenvalue-greater-than-one rule?**
 
+```{r}
+eigen_vals <- (mtcars.pca$sdev)^2
+length(which(eigen_vals > 1))
+```
+
 2 principal components.
 
 **19. What is the value of the total variance? Why?**
@@ -261,7 +284,10 @@ Next, a couple of plots will be produced to visualize the PCA solution. You will
 **21. Use the function `biplot()` with the argument `choices = c(1, 2)` to ask for a biplot for the first two principal components.**
 
 ```{r}
-biplot(mtcars.pca, choices = c(1,2), cex = 0.5)
+#| fig-heigth: 10
+#| fig-width: 10
+
+biplot(mtcars.pca, choices = c(1,2), cex = 1)
 ```
 
 The axes of the biplot are seen as arrows originating from the center point. Here, you see that the variables hp, cyl, and disp all contribute to PC1, with higher values in those variables moving the observations to the right on this plot. This lets you see how the car models relate to the axes. You can also see which cars are similar to one another. For example, the Maserati Bora, Ferrari Dino and Ford Pantera L all cluster together at the top. This makes sense, as all of these are sports cars.
@@ -269,7 +295,10 @@ The axes of the biplot are seen as arrows originating from the center point. Her
 **22. Make a biplot for the first and third principal components. Especially which brand of car has negative values on the first principal component and positive values on the third principal component?**
 
 ```{r}
-biplot(mtcars.pca, choices = c(1,3), cex = 0.5)
+#| fig-heigth: 10
+#| fig-width: 10
+
+biplot(mtcars.pca, choices = c(1,3), cex = 1)
 ```
 
 Especially the brand "Merc" tends to have a high positive score on PC3 and a high negative score on PC1
@@ -280,4 +309,4 @@ Especially the brand "Merc" tends to have a high positive score on PC3 and a hig
 screeplot(mtcars.pca, type = 'lines')
 ```
 
-According to the screeplot, we should extract 2 principal components, as if we draw a straight line it passes through PC 3 to 9, and if we then take the elements before the elbow, only PC 1 and PC2 remain.
+According to the screeplot, we should extract 2 principal components, as if we draw a straight line it passes through PC 3 to 9, and if we then take the elements before the elbow, only PC 1 and PC2 remain. This is in agreement with the number of principal components extracted according to the eigenvalue-greater-than-one rule.

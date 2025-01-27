@@ -1,10 +1,12 @@
 ---
-title: "Practical 04"
+title: "Practical 4: Hierarchical and k-means clustering"
 author: "Ward B. Eiling"
 format: 
-  pdf:
-    self-contained: yes
-editor: visual
+  html:
+    self-contained: true
+execute:
+  warning: false
+  message: false
 ---
 
 # 1 Introduction
@@ -40,7 +42,7 @@ colnames(sim_matrix) <- c("x1", "x2")
 sim_df <- 
   sim_matrix %>% 
   as_tibble() %>%
-  # randomly sample units to categories A, B and C (with replacement)
+  # create class variable with equal chance to be assigned to A, B, or C
   mutate(class = sample(c("A", "B", "C"), size = 100, 
                         replace = TRUE))
 
@@ -107,19 +109,19 @@ sim_df_small_unsupervised %>%
   hclust(method = "complete") %>% 
   ggdendrogram(., rotate = FALSE) + 
   ylim(0, 10) + 
-  ggtitle("Small differences") -> d1
+  ggtitle("Small differences, Euclidian") -> d1
 
 sim_df_large_unsupervised %>%
   dist(, method = "euclidean") %>% 
   hclust(method = "complete") %>% 
   ggdendrogram(., rotate = FALSE) + 
   ylim(0, 10) + 
-  ggtitle("Large differences") -> d2
+  ggtitle("Large differences, Euclidian") -> d2
 
 d1 + d2
 ```
 
-The difference between de dendograms is that the small difference dataset has a lower mean cluster dissimilarity compared to the large difference dataset. This is because the small difference dataset has less variation in the values of x1 and x2 for each class compared to the large difference dataset. This can be seen in the dendograms, where the small difference dataset has shorter branches and a lower mean cluster dissimilarity compared to the large difference dataset.
+The difference between de dendograms is that the small difference dataset has a lower mean between-cluster dissimilarity compared to the large difference dataset. This is because the small difference dataset has less variation in the values of x1 and x2 for each class compared to the large difference dataset. This can be seen in the dendograms, where the small difference dataset has shorter branches and a lower mean between-cluster dissimilarity compared to the large difference dataset.
 
 **5. For the dataset with small differences, also run a complete agglomeration hierarchical cluster with manhattan distance.**
 
@@ -129,8 +131,12 @@ sim_df_small_unsupervised %>%
   hclust(method = "complete") %>% 
   ggdendrogram(., rotate = FALSE) + 
   ylim(0, 10) + 
-  ggtitle("Small differences")
+  ggtitle("Small differences, Manhattan") -> d1_manhat
+
+d1 + d1_manhat
 ```
+
+We can see that the Manhattan distance generally finds greater between-cluster dissimilarity than when using the Euclidian distance metric.
 
 **6. Use the `cutree()` function to obtain the cluster assignments for three clusters and compare the cluster assignments to the 3-cluster euclidian solution. Do this comparison by creating two scatter plots with cluster assignment mapped to the colour aesthetic. Which difference do you see?**
 
@@ -160,18 +166,17 @@ sim_df_small %>%
   mutate(cluster_euclidean = clusters_euclidean,
          cluster_manhattan = clusters_manhattan) %>%
   ggplot(aes(x = x1, y = x2, color = as.factor(cluster_manhattan))) +
-  
   geom_point() +
   ggtitle("Manhattan") -> p2
 
 p1 + p2
 ```
 
+The Euclidian solution has slightly different class assignment, with more people in the first (red) class and less in the second (green) class than the Manhattan solution. This shows that the choice of distance metric can have an impact on the clustering results. More generally, it seems that the Euclidian clustering method prefers more circular classes and the Manhattan clustering method more rectangular classes.
+
 # 3 Practical exercises
 
 ## 3.1 K-means clustering
-
-The Euclidian solution has slightly different class assignment, with more people in the first (red) class and less in the second (green) class than the Manhattan solution. This shows that the choice of distance metric can have an impact on the clustering results.
 
 **7. Create k-means clusterings with 2, 3, 4, and 6 classes on the large difference data. Again, create coloured scatter plots for these clusterings.**
 
@@ -391,7 +396,8 @@ kmedians_clust_smart <- function(data, k, smart_init = FALSE){
     iterations <- iterations + 1
   }
   
-  print(paste("Number of iterations:", iterations))
+   # print some information
+  cat("K-medians with K =", k, "| Iterations:", iterations, "| converged:", converged, "\n")
   
   return(data)
 }

@@ -1,7 +1,12 @@
 ---
 title: "Practical 8: Natural Language Processing"
 author: "Ward B. Eiling"
-format: html
+format: 
+  html:
+    self-contained: true
+execute:
+  warning: false
+  message: false
 ---
 
 # Introduction

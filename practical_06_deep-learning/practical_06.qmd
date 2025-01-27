@@ -1,7 +1,12 @@
 ---
 title: "Practical 6: Deep Learning"
 author: "Ward B. Eiling"
-format: html
+format: 
+  html:
+    self-contained: true
+execute:
+  warning: false
+  message: false
 ---
 
 # 1 Introduction
