@@ -19,11 +19,17 @@ Okay, here is a draft of a 2-hour open-book exam based on the provided materials
 
 1.  Explain the concept of the "curse of dimensionality." How does it affect machine learning models? Give two examples from the sources of situations where high dimensionality is encountered.
 
-...
+The curse of dimensionality refers to the problem where a great number a dimensions poses difficulties for many commonly used statistical methods. For instance, when the number of predictors P is greater than the number of units N, a statistical problem may be un(der)determined using (ordinary) least squares estimation. This implies that there are an infinitely many lines going through a point, infinitely many planes through two points and infinitely many N-dimensional hyperplanes going through N points.
+
+High dimensionality is often encountered in text data, where a book may include tens of thousands of words. Especially bag-of-word representations of text data, such as books may be very high-dimensional.
+
+High dimensionality is also encountered in image data, where every pixel could represent one or multiple features, as we may want to save brightness information, color information, etc. Taking this even further, video data contains many images usually every 1/60th of a second, meaning that in a video of 2 minutes long we have a video of 120\*60 images, all of which will probably at least have 1920x1080 pixels.
 
 2.  Describe at least two methods for dimensionality reduction discussed in the sources. Explain how they work conceptually and what kind of problems each method addresses. Compare and contrast them.
 
-...
+principal components analysis is a frequently used method for dimension reduction that essentially tries to maximize the variance of the projected data in the first component and for subsequent components it also maximizes the variance on the projected data while being constrained to be orthogonal to all previous components. This method addresses problems with continuous variables, where we assume that all variance in the features is relevant (e.g., measurement error is limited).
+
+Another method for dimension reduction is independent components analysis, which assumes that factors are independent which is enforced through orthogonal rotation. As a result, it elliminates the multicollinearity problems in estimating factor regression coefficients. It is suitable for research problems were we expect the presence of separate uniform signals, so that we may succesfully filter out noise and focus on the signal that we care about.
 
 3.  **Principal Component Analysis (PCA)** is a common technique for dimension reduction.
     -   Explain the general idea of how PCA works.
@@ -37,33 +43,35 @@ Okay, here is a draft of a 2-hour open-book exam based on the provided materials
 
 4.  Explain the difference between feature selection and feature extraction. Give an example of each from the sources.
 
-...
+Feature selection methods essentially remove some features from the data, whereas feature extraction takes/extracts useful bits of information from the input features by transforming them into something more useful (e.g., principal components, independent components).
+
+Feature selection could be best subset selection or stepwise regression, whereas feature extraction could be performed by independent components analysis.
 
 5.  What are some practical considerations when dealing with high-dimensional data, especially in the context of linear models?
 
-...
+That the more variables/features there are, the harder it becomes for a model to deal with overfitting. For instance, more features often increase the likelihood of encountering multicollinearity (correlated feature groups), which is often a major issue, especially for wrapping methods such as stepwise regression, but is better dealt with by LASSO/Ridge regression. In addition, high dimensional data tends to inflate the uncertainty of the parameter estimates, thereby making it less likely that a null hypothesis is rejected.
 
 **Section 2: Clustering and Model-Based Clustering (40 minutes)**
 
 1.  What is the goal of clustering? Name and briefly describe two main types of clustering methods.
 
-...
+The goal of clustering is predict an unobserved class (i.e., perform classification) and reduce $P$ features into one categorical (latent) variable. The two main types of clustering methods are rule-/algorithm- based clustering methods (e.g., k-means clustering, hierarchical clustering) and model-based clustering (e.g., LPA, LCA, LDA). The former make implicit assumptions inherent in the algorithm process, while the latter makes its assumptions explicit.
 
 2.  What are some key considerations when assessing clustering solutions?
 
-...
+First, we need to make sure the data is scaled appropriately and that a suitable distance metric is chosen. For assessing clustering solutions we have to consider (1) stability, (2) external validity and (3) internal indices and model fit. Concerning internal indices, we are often interested in solutions that show separation (i.e., great between-cluster dissimilarity) and cohesion (e.g., great within-cluster similarity) Using these two parts, we may compute the Silhouette coefficient, that takes into account both. On the other hand, in the case of model-based methods we can employ metrics of model fit (i.e., information criteria). On top of this, we would also like our cluster solution to be parsimonious (i.e., if two cluster solutions explain the same amount of variation, we prefer the cluster solution with the lowest number of clusters).
 
 3.  How do model-based clustering methods differ from traditional clustering algorithms like k-means? What is a key assumption in model-based clustering?
 
-...
+In model-based clustering, we assume that we can derive the distribution of latent groups from a set of features and that we can use this information to compute posterior probabilities for a given individual.
 
 4.  Describe how the Expectation-Maximization (EM) algorithm is used in the context of model-based clustering?
 
-...
+The EM algorithm essentially first makes a guess about the parameters, then works out the posterior density of being in a certain class (making assumptions), whereafter it updates the parameters iteratively until the parameters stop changing.
 
 5.  What are some common challenges in the practical use of cluster analysis?
 
-...
+That we assume that the clusters have a certain shape (e.g., circle ellipse). For instance, it may have to use merging methods in the case of the GMM to obtain non-Gaussian clusters.
 
 ### **Section 3: Text Mining and Topic Modeling (40 minutes)**
 
