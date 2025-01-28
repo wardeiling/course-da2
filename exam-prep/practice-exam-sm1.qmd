@@ -1,0 +1,254 @@
+---
+title: "Practice Exam SM1"
+author: "Ward B. Eiling"
+format: html
+---
+
+Okay, here is a draft of a 2-hour open-book exam based on the provided materials, focusing on conceptual and applied questions:
+
+## **Exam Instructions:**
+
+-   This is an open-book exam. You may use any of the provided course materials.
+-   The exam is designed to assess your understanding of the core concepts and your ability to apply them.
+-   Please be concise and clear in your answers.
+-   The total time for this exam is 2 hours.
+
+## **Exam Questions:**
+
+### **Section 1: High-Dimensionality and Dimensionality Reduction (40 minutes)**
+
+1.  Explain the concept of the "curse of dimensionality." How does it affect machine learning models? Give two examples from the sources of situations where high dimensionality is encountered.
+
+...
+
+2.  Describe at least two methods for dimensionality reduction discussed in the sources. Explain how they work conceptually and what kind of problems each method addresses. Compare and contrast them.
+
+...
+
+3.  **Principal Component Analysis (PCA)** is a common technique for dimension reduction.
+    -   Explain the general idea of how PCA works.
+    -   How are principal components chosen?
+    -   How is PCA used in principal components regression (PCR)?
+    -   What is a drawback of PCR?
+    -   In the context of PCA, what does it mean for components to be uncorrelated?
+    -   What is the difference between using PCA for exploratory data analysis vs for supervised learning?
+
+...
+
+4.  Explain the difference between feature selection and feature extraction. Give an example of each from the sources.
+
+...
+
+5.  What are some practical considerations when dealing with high-dimensional data, especially in the context of linear models?
+
+...
+
+**Section 2: Clustering and Model-Based Clustering (40 minutes)**
+
+1.  What is the goal of clustering? Name and briefly describe two main types of clustering methods.
+
+...
+
+2.  What are some key considerations when assessing clustering solutions?
+
+...
+
+3.  How do model-based clustering methods differ from traditional clustering algorithms like k-means? What is a key assumption in model-based clustering?
+
+...
+
+4.  Describe how the Expectation-Maximization (EM) algorithm is used in the context of model-based clustering?
+
+...
+
+5.  What are some common challenges in the practical use of cluster analysis?
+
+...
+
+### **Section 3: Text Mining and Topic Modeling (40 minutes)**
+
+1.  Why is text data considered high-dimensional? What are some of the challenges when working with text data?
+
+...
+
+2.  What is a "bag of words" representation, and how is it used in text mining? What are some of its limitations?
+
+...
+
+3.  Explain the core idea behind topic modeling. How does it help with the analysis of large text collections?
+
+...
+
+4.  Briefly describe the Latent Dirichlet Allocation (LDA) model. What is the intuition behind how LDA works?
+
+...
+
+5.  How does topic modeling represent documents and words? What is the interpretation of "topics" in topic models?
+
+...
+
+6.  How can you determine the number of topics in a topic model?
+
+...
+
+7.  What is the difference between Latent Semantic Analysis (LSA) and Probabilistic Latent Semantic Analysis (PLSA)? How does PLSA address some of the limitations of LSA?
+
+...
+
+8.  Describe the role of the Expectation Maximization (EM) algorithm in PLSA. What is the tempered EM algorithm, and what is its goal?
+
+...
+
+9.  How can topic models be used for information retrieval?
+
+...
+
+### **Section 4: Word Embeddings and Neural Networks (20 minutes)**
+
+1.  Explain the concept of word embeddings. How do they capture the meaning of words?
+
+...
+
+2.  Describe the skip-gram model for generating word embeddings? How are positive and negative examples used in this model?
+
+...
+
+3.  What are some advantages of using pre-trained word embeddings?
+
+...
+
+4.  How are neural networks used in the context of deep learning? What is the difference between feedforward and convolutional neural networks? What are recurrent neural networks (RNN) used for?
+
+...
+
+## **Exam Questions and Rubric**
+
+### **Section 1: High-Dimensionality and Dimensionality Reduction (40 minutes)**
+
+1.  Explain the concept of the "curse of dimensionality." How does it affect machine learning models? Give two examples from the sources of situations where high dimensionality is encountered.
+    -   **Rubric:**
+        -   (2 points) Clear explanation of the "curse of dimensionality" (e.g., increased sparsity, computational complexity, overfitting).
+        -   (2 points) Explanation of its impact on machine learning models (e.g., reduced model performance, need for more data, difficulty generalizing).
+        -   (2 points) Two examples from the sources (e.g., NIR Spectroscopy of corn samples, gene expression datasets, text data).
+2.  Describe at least two methods for dimensionality reduction discussed in the sources. Explain how they work conceptually and what kind of problems each method addresses. Compare and contrast them.
+    -   **Rubric:**
+        -   (2 points) Description of at least two methods (e.g., feature selection, PCA, feature extraction, topic modeling).
+        -   (2 points) Conceptual explanation of how each method works (e.g., PCA finds principal components, feature selection chooses relevant features).
+        -   (2 points) Explanation of what problems each method addresses (e.g., PCA: multicollinearity, feature selection: irrelevant features).
+        -   (2 points) Comparison and contrast of the methods (e.g., PCA creates new features, feature selection keeps original features).
+3.  **Principal Component Analysis (PCA)** is a common technique for dimension reduction.
+    -   Explain the general idea of how PCA works.
+    -   How are principal components chosen?
+    -   How is PCA used in principal components regression (PCR)?
+    -   What is a drawback of PCR?
+    -   In the context of PCA, what does it mean for components to be uncorrelated?
+    -   What is the difference between using PCA for exploratory data analysis vs for supervised learning?
+    -   **Rubric:**
+        -   (2 points) General idea of PCA: identifying directions of maximum variance.
+        -   (2 points) Principal components chosen: by the amount of variance they explain in the data.
+        -   (2 points) How PCR uses PCA: using the principal components as predictors in a regression model.
+        -   (2 points) Drawback of PCR: assumes directions of maximal variation are the ones associated with the outcome.
+    -   (2 points) Uncorrelated components: Components that do not covary with each other (i.e. are orthogonal in the feature space). \* (2 points) PCA for EDA vs. supervised learning: In EDA, PCA is used to reduce dimensions to visualize patterns, whereas in supervised learning, PCA reduces dimensions to improve the performance of prediction models.
+4.  Explain the difference between feature selection and feature extraction. Give an example of each from the sources.
+    -   **Rubric:**
+        -   (2 points) Feature selection: choosing a subset of original variables
+        -   (2 points) Feature extraction: creating new variables based on the original ones.
+        -   (2 points) Example of feature selection: variance filter, correlation filter.
+        -   (2 points) Example of feature extraction: PCA, topic modeling.
+5.  What are some practical considerations when dealing with high-dimensional data, especially in the context of linear models?
+    -   **Rubric:**
+        -   (2 points) Need for regularization (e.g., ridge, lasso).
+        -   (2 points) Potential for overfitting, and how to address this.
+        -   (2 points) Importance of feature scaling (e.g., standardization).
+        -   (2 points) Computational challenges and need for efficient algorithms.
+
+### **Section 2: Clustering and Model-Based Clustering (40 minutes)**
+
+1.  What is the goal of clustering? Name and briefly describe two main types of clustering methods.
+    -   **Rubric:**
+        -   (2 points) Goal of clustering: find subgroups of similar examples.
+        -   (2 points) Two main types:
+            -   Hierarchical clustering: builds a hierarchy of clusters.
+            -   Partitional clustering (e.g., k-means): divides data into non-overlapping clusters.
+2.  What are some key considerations when assessing clustering solutions?
+    -   **Rubric:**
+        -   (2 points) Stability of clusters: how consistent are they across different runs.
+        -   (2 points) External validity: do clusters relate to external features.
+        -   (2 points) Internal indices: how cohesive are clusters, and how separated are they.
+        -   (2 points) Choice of parameters for methods.
+3.  How do model-based clustering methods differ from traditional clustering algorithms like k-means? What is a key assumption in model-based clustering?
+    -   **Rubric:**
+        -   (2 points) Model-based clustering: assumes data is generated from a mixture of probability distributions.
+        -   (2 points) Traditional clustering (e.g., k-means): partitions data based on distance metrics.
+        -   (2 points) Key assumption: data arises from a mixture of distributions, where each component corresponds to a cluster.
+4.  Describe how the Expectation-Maximization (EM) algorithm is used in the context of model-based clustering?
+    -   **Rubric:**
+        -   (2 points) EM Algorithm: iterative algorithm to find parameters of model based on probability distributions.
+        -   (2 points) E-step: calculates the probability of cluster membership for each data point given model parameters.
+        -   (2 points) M-step: updates model parameters based on cluster membership probabilities.
+        -   (2 points) Iterates until parameters converge.
+5.  What are some common challenges in the practical use of cluster analysis?
+    -   **Rubric:** \* (2 points) Choice of distance/similarity measure. \* (2 points) Determining the number of clusters. \* (2 points) Interpreting and validating clusters. \* (2 points) Sensitivity to parameters.
+
+### **Section 3: Text Mining and Topic Modeling (40 minutes)**
+
+1.  Why is text data considered high-dimensional? What are some of the challenges when working with text data?
+    -   **Rubric:**
+        -   (2 points) High dimensionality: due to the large number of possible words and phrases.
+        -   (2 points) Challenges: sparsity of data, complex relationships, ambiguity and context sensitivity.
+2.  What is a "bag of words" representation, and how is it used in text mining? What are some of its limitations?
+    -   **Rubric:**
+        -   (2 points) Bag of words: represents text as a collection of words, ignoring grammar and word order.
+        -   (2 points) Use in text mining: converts text into numerical vectors for analysis.
+        -   (2 points) Limitations: ignores word order, semantics, and context.
+3.  Explain the core idea behind topic modeling. How does it help with the analysis of large text collections?
+    -   **Rubric:**
+        -   (2 points) Core idea: documents are mixtures of topics, where topics are probability distributions over words.
+        -   (2 points) Helps with analysis: uncovers hidden thematic structures, reduces dimensionality, and provides interpretable summaries.
+4.  Briefly describe the Latent Dirichlet Allocation (LDA) model. What is the intuition behind how LDA works?
+    -   **Rubric:**
+        -   (2 points) LDA: a probabilistic model that assumes documents are generated from a mixture of topics.
+    -   (2 points) Intuition: words are drawn from topics, and documents are characterized by their distribution over topics.
+5.  How does topic modeling represent documents and words? What is the interpretation of "topics" in topic models?
+    -   **Rubric:**
+        -   (2 points) Documents are represented by a distribution over topics.
+            -   (2 points) Words are represented by their association with topics.
+            -   (2 points) Topics are interpretable probability distributions over words, representing underlying themes.
+6.  How can you determine the number of topics in a topic model?
+    -   **Rubric:**
+        -   (2 points) Bayesian model selection.
+        -   (2 points) Evaluate generalization performance on new tasks/holdout sets.
+        -   (2 points) Non-parametric Bayesian methods.
+7.  What is the difference between Latent Semantic Analysis (LSA) and Probabilistic Latent Semantic Analysis (PLSA)? How does PLSA address some of the limitations of LSA?
+    -   **Rubric:**
+        -   (2 points) LSA: uses SVD to reduce dimensionality and find latent semantic relationships in text, which is non-probabilistic.
+        -   (2 points) PLSA: a probabilistic model that represents documents as mixtures of topics.
+        -   (2 points) PLSA addresses LSA limitations: by providing a solid statistical foundation, and explicit probabilities for topics and words.
+8.  Describe the role of the Expectation Maximization (EM) algorithm in PLSA. What is the tempered EM algorithm, and what is its goal?
+    -   **Rubric:** \* (2 points) EM algorithm in PLSA: is used to estimate the topic distributions (model parameters) in PLSA by iterating between assigning documents to topics (E-step) and updating the parameters (M-step). \* (2 points) Tempered EM: variation of EM in PLSA to improve generalization by controlling model complexity by introducing an "inverse temperature" parameter β. \* (2 points) Goal of TEM: is to avoid local optima and improve generalization.
+9.  How can topic models be used for information retrieval?
+    -   **Rubric:**
+        -   (2 points) Represent documents and queries in the topic space.
+        -   (2 points) Measure similarity based on the topic distributions.
+        -   (2 points) Retrieval of relevant documents using a query that maximizes conditional probability of the query given the candidate document.
+
+### **Section 4: Word Embeddings and Neural Networks (20 minutes)**
+
+1.  Explain the concept of word embeddings. How do they capture the meaning of words?
+    -   **Rubric:**
+        -   (2 points) Word embeddings: dense, low-dimensional vector representations of words.
+        -   (2 points) Capturing meaning: similar words have similar vectors; relationships between vectors reflect relationships between words.
+2.  Describe the skip-gram model for generating word embeddings? How are positive and negative examples used in this model?
+    -   **Rubric:**
+        -   (2 points) Skip-gram model: predicts context words given a target word.
+        -   (2 points) Positive examples: target word and neighboring context.
+        -   (2 points) Negative examples: target word and randomly sampled words from the lexicon.
+3.  What are some advantages of using pre-trained word embeddings?
+    -   **Rubric:**
+        -   (2 points) Saves computation time.
+        -   (2 points) Useful for smaller datasets.
+        -   (2 points) Captures general semantic knowledge from large corpora.
+4.  How are neural networks used in the context of deep learning? What is the difference between feedforward and convolutional neural networks? What are recurrent neural networks (RNN) used for?
+    -   **Rubric:**
+        -   (2 points) Neural networks in deep learning: to learn complex patterns and representations from data.
+    -   (2 points) Feedforward neural networks process inputs in one direction, without loops. Convolutional neural networks (CNNs) use convolutional layers for feature extraction, and are good at processing images. \* (2 points) RNNs process sequential data using loops in the network (feedback connections). They are used for sequence labeling tasks (e.g. part-of-speech tagging) and text generation.

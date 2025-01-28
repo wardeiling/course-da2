@@ -1,7 +1,9 @@
 ---
-title: "Practice-Exam"
+title: "Practice Exam"
 author: "Ward B. Eiling"
-format: html
+format: 
+  html:
+    self-contained: true
 ---
 
 ### Practice Exam
