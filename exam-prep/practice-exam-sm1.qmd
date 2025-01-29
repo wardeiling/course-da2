@@ -1,7 +1,9 @@
 ---
 title: "Practice Exam SM1"
 author: "Ward B. Eiling"
-format: html
+format: 
+  html:
+    self-contained: true
 ---
 
 Okay, here is a draft of a 2-hour open-book exam based on the provided materials, focusing on conceptual and applied questions:
@@ -43,7 +45,7 @@ Another method for dimension reduction is independent components analysis, which
 
 4.  Explain the difference between feature selection and feature extraction. Give an example of each from the sources.
 
-Feature selection methods essentially remove some features from the data, whereas feature extraction takes/extracts useful bits of information from the input features by transforming them into something more useful (e.g., principal components, independent components).
+Feature selection methods essentially remove some features from the data, whereas feature extraction takes/extracts useful bits of information from the input features by transforming them into a more useful variable (e.g., principal components, independent components).
 
 Feature selection could be best subset selection or stepwise regression, whereas feature extraction could be performed by independent components analysis.
 
@@ -196,7 +198,11 @@ That we assume that the clusters have a certain shape (e.g., circle ellipse). Fo
         -   (2 points) M-step: updates model parameters based on cluster membership probabilities.
         -   (2 points) Iterates until parameters converge.
 5.  What are some common challenges in the practical use of cluster analysis?
-    -   **Rubric:** \* (2 points) Choice of distance/similarity measure. \* (2 points) Determining the number of clusters. \* (2 points) Interpreting and validating clusters. \* (2 points) Sensitivity to parameters.
+    -   **Rubric:**
+        -   (2 points) Choice of distance/similarity measure.
+        -   (2 points) Determining the number of clusters.
+        -   (2 points) Interpreting and validating clusters.
+        -   (2 points) Sensitivity to parameters.
 
 ### **Section 3: Text Mining and Topic Modeling (40 minutes)**
 
@@ -233,7 +239,10 @@ That we assume that the clusters have a certain shape (e.g., circle ellipse). Fo
         -   (2 points) PLSA: a probabilistic model that represents documents as mixtures of topics.
         -   (2 points) PLSA addresses LSA limitations: by providing a solid statistical foundation, and explicit probabilities for topics and words.
 8.  Describe the role of the Expectation Maximization (EM) algorithm in PLSA. What is the tempered EM algorithm, and what is its goal?
-    -   **Rubric:** \* (2 points) EM algorithm in PLSA: is used to estimate the topic distributions (model parameters) in PLSA by iterating between assigning documents to topics (E-step) and updating the parameters (M-step). \* (2 points) Tempered EM: variation of EM in PLSA to improve generalization by controlling model complexity by introducing an "inverse temperature" parameter β. \* (2 points) Goal of TEM: is to avoid local optima and improve generalization.
+    -   **Rubric:**
+        -   (2 points) EM algorithm in PLSA: is used to estimate the topic distributions (model parameters) in PLSA by iterating between assigning documents to topics (E-step) and updating the parameters (M-step).
+        -   (2 points) Tempered EM: variation of EM in PLSA to improve generalization by controlling model complexity by introducing an "inverse temperature" parameter β.
+        -   (2 points) Goal of TEM: is to avoid local optima and improve generalization.
 9.  How can topic models be used for information retrieval?
     -   **Rubric:**
         -   (2 points) Represent documents and queries in the topic space.
@@ -259,4 +268,5 @@ That we assume that the clusters have a certain shape (e.g., circle ellipse). Fo
 4.  How are neural networks used in the context of deep learning? What is the difference between feedforward and convolutional neural networks? What are recurrent neural networks (RNN) used for?
     -   **Rubric:**
         -   (2 points) Neural networks in deep learning: to learn complex patterns and representations from data.
-    -   (2 points) Feedforward neural networks process inputs in one direction, without loops. Convolutional neural networks (CNNs) use convolutional layers for feature extraction, and are good at processing images. \* (2 points) RNNs process sequential data using loops in the network (feedback connections). They are used for sequence labeling tasks (e.g. part-of-speech tagging) and text generation.
+        -   (2 points) Feedforward neural networks process inputs in one direction, without loops. Convolutional neural networks (CNNs) use convolutional layers for feature extraction, and are good at processing images.
+        -   (2 points) RNNs process sequential data using loops in the network (feedback connections). They are used for sequence labeling tasks (e.g. part-of-speech tagging) and text generation.
